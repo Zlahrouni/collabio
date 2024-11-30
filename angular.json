@@ -7,7 +7,23 @@
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
-          "style": "scss"
+          "path": "src/app/components",
+          "standalone": true,
+          "prefix": "clb",
+          "style": "scss",
+          "skipTests": false
+        },
+        "@schematics/angular:service": {
+          "path": "src/app/services",
+          "skipTests": false
+        },
+        "@schematics/angular:class": {
+          "path": "src/app/models",
+          "skipTests": true
+        },
+        "@schematics/angular:pipe": {
+          "standalone": true,
+          "path": "src/app/components/shared/pipes"
         }
       },
       "root": "",
@@ -27,7 +43,7 @@
             "inlineStyleLanguage": "scss",
             "assets": [
               "src/favicon.ico",
-              "src/assets"
+              "src/app/assets"
             ],
             "styles": [
               "src/styles.scss"
