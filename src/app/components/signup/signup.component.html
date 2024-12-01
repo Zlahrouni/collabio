@@ -1,1 +1,73 @@
-<p>signup works!</p>
+<div class="flex min-h-full flex-col justify-center px-6 lg:px-8">
+  <div class="sm:mx-auto sm:w-full sm:max-w-sm">
+    <img class="mx-auto h-20 w-auto" src="app/assets/logo_long.png" alt="Collabio logo">
+    <h2 class="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-900">Create Your Account</h2>
+  </div>
+
+
+  <div *ngFor="let error of messageErrors"
+    class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4 rounded animate-fadeIn"
+    role="alert">
+    <div class="flex items-center">
+      <svg class="h-5 w-5 text-red-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    {{ error }}
+    </div>
+  </div>
+
+  <div class="mt-5 sm:mx-auto sm:w-full sm:max-w-sm">
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="space-y-6">
+      <div>
+        <label for="email" class="block text-sm/6 font-medium text-gray-900">Email Address</label>
+        <div class="mt-2">
+          <input id="email" formControlName="email" type="email" autocomplete="email" required 
+            class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6">
+        </div>
+        <div *ngIf="email?.invalid && (email?.dirty || email?.touched)" class="text-red-500 text-sm mt-1">
+          <div *ngIf="email?.errors?.['required']">Email is required</div>
+          <div *ngIf="email?.errors?.['email']">Invalid email address</div>
+        </div>
+      </div>
+
+      <div>
+          <label for="password" class="block text-sm/6 font-medium text-gray-900">Password</label>
+          <div class="mt-2">
+              <input id="password" formControlName="password" type="password" autocomplete="new-password" required 
+              class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6">
+          </div>
+          <div *ngIf="password?.invalid && (password?.dirty || password?.touched)" class="text-red-500 text-sm mt-1">
+              <div *ngIf="password?.errors?.['required']">Le mot de passe est requis</div>
+              <div *ngIf="password?.errors?.['minlength']">Le mot de passe doit contenir au moins 6 caractères</div>
+          </div>
+      </div>
+
+      <div>
+          <label for="confirmPassword" class="block text-sm/6 font-medium text-gray-900">Confirm Password</label>
+          <div class="mt-2">
+              <input id="confirmPassword" formControlName="confirmPassword" type="password" required 
+              class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6">
+          </div>
+          <div *ngIf="confirmPassword?.invalid && (confirmPassword?.dirty || confirmPassword?.touched)" class="text-red-500 text-sm mt-1">
+              <div *ngIf="confirmPassword?.errors?.['required']">La confirmation du mot de passe est requise</div>
+              <div *ngIf="confirmPassword?.errors?.['passwordMismatch']">Les mots de passe ne correspondent pas</div>
+          </div>
+      </div>
+
+      <div>
+        <button type="submit"
+          class="flex w-full justify-center rounded-md purple px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm bg-indigo-600 hover:bg-indigo-600/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+          Sign Up
+        </button>
+      </div>
+    </form>
+
+    <p class="mt-10 text-center text-sm/6 text-gray-500">
+      Already registered ?
+      <a routerLink="/login" class="font-semibold text-indigo-600 hover:text-indigo-500">Log  in</a>
+    </p>
+
+
+
+  </div>
+</div>

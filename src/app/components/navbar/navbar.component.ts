@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {RouterLink} from "@angular/router";
+import { Router, RouterLink } from "@angular/router";
+import { AuthService } from 'src/app/services/auth.service';
+import { Observable } from 'rxjs';
+import { User } from '@angular/fire/auth';
 
 @Component({
   selector: 'clb-navbar',
@@ -10,7 +13,13 @@ import {RouterLink} from "@angular/router";
   styleUrls: ['./navbar.component.scss']
 })
 export class NavbarComponent implements OnInit {
-  user$ = false;
+  user$: Observable<User | null>; 
+
+  constructor(private authService: AuthService, private router: Router) {
+    this.user$ = this.authService.user$;
+    
+  }
+  
   ngOnInit(): void {
     const userMenuButton = document.getElementById('user-menu');
     const profileDropdown = document.getElementById('profile-dropdown');
@@ -34,5 +43,17 @@ export class NavbarComponent implements OnInit {
         profileDropdown?.classList.add('hidden');
       }
     });
+  }
+
+
+
+
+   async logout(): Promise<void> {
+    try {
+      await this.authService.logout();
+      await this.router.navigate(['/login']);
+    } catch (error) {
+      console.error('Erreur lors de la déconnexion:', error);
+    }
   }
 }
