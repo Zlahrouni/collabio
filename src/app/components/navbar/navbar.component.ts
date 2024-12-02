@@ -60,7 +60,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   async logout(): Promise<void> {
     try {
       await this.authService.logout();
-      await this.router.navigate(['/=login']);
+      await this.router.navigate(['/login']);
     } catch (error) {
       console.error('Erreur lors de la déconnexion:', error);
     }
