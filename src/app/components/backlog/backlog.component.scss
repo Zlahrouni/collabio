@@ -1,0 +1,187 @@
+$primary-color: #0052CC;
+$secondary-color: #42526E;
+$border-color: #DFE1E6;
+$high-priority-color: #FF5630;
+$medium-priority-color: #FFAB00;
+$low-priority-color: #36B37E;
+
+.backlog-container {
+  background-color: #F4F5F7;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+  .backlog-header {
+    background-color: white;
+    padding: 20px;
+    border-bottom: 1px solid $border-color;
+
+    .backlog-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+
+      h2 {
+        margin: 0;
+        color: $secondary-color;
+      }
+
+      .backlog-actions {
+        .btn {
+          margin-left: 10px;
+          padding: 8px 16px;
+          border-radius: 3px;
+          border: none;
+          cursor: pointer;
+
+          &.btn-primary {
+            background-color: $primary-color;
+            color: white;
+          }
+
+          &.btn-secondary {
+            background-color: #EBECF0;
+            color: $secondary-color;
+          }
+        }
+      }
+    }
+
+    .backlog-filters {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      .search-container {
+        position: relative;
+        flex-grow: 1;
+        margin-right: 15px;
+
+        .search-input {
+          width: 100%;
+          padding: 10px 35px 10px 15px;
+          border: 1px solid $border-color;
+          border-radius: 3px;
+        }
+
+        .search-icon {
+          position: absolute;
+          right: 10px;
+          top: 50%;
+          transform: translateY(-50%);
+        }
+      }
+
+      .filter-group {
+        .filter-select {
+          padding: 10px;
+          border: 1px solid $border-color;
+          border-radius: 3px;
+        }
+      }
+    }
+  }
+
+  .backlog-content {
+    display: grid;
+    grid-template-columns: 2fr;
+    gap: 20px;
+    padding: 20px;
+
+    .backlog-stories {
+      .backlog-story-list {
+        .story-item {
+          background-color: white;
+          border: 1px solid $border-color;
+          border-radius: 3px;
+          padding: 15px;
+          margin-bottom: 10px;
+
+          .story-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+
+            .story-key {
+              color: $secondary-color;
+              font-weight: bold;
+            }
+
+            .story-priority {
+              padding: 3px 8px;
+              border-radius: 3px;
+              font-size: 12px;
+              font-weight: bold;
+
+              &.high {
+                background-color: lighten($high-priority-color, 35%);
+                color: $high-priority-color;
+              }
+
+              &.medium {
+                background-color: lighten($medium-priority-color, 35%);
+                color: $medium-priority-color;
+              }
+            }
+          }
+
+          .story-details {
+            h3 {
+              margin: 0 0 10px 0;
+              color: $secondary-color;
+            }
+
+            p {
+              color: lighten($secondary-color, 20%);
+              margin: 0;
+            }
+          }
+
+          .story-metadata {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            color: $secondary-color;
+            font-size: 14px;
+          }
+        }
+      }
+    }
+
+    .backlog-sprint-planning {
+      .sprint-summary {
+        background-color: white;
+        border: 1px solid $border-color;
+        border-radius: 3px;
+        padding: 15px;
+
+        .sprint-details {
+          .sprint-dates {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            color: $secondary-color;
+          }
+
+          .sprint-progress {
+            .progress-bar {
+              background-color: #DFE1E6;
+              height: 10px;
+              border-radius: 5px;
+              margin-bottom: 5px;
+
+              .progress {
+                background-color: $primary-color;
+                height: 100%;
+                border-radius: 5px;
+              }
+            }
+
+            span {
+              color: $secondary-color;
+            }
+          }
+        }
+      }
+    }
+  }
+}

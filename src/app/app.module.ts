@@ -11,6 +11,7 @@ import { getFirestore, provideFirestore } from '@angular/fire/firestore';
 import { getAuth, provideAuth } from '@angular/fire/auth';
 import { getStorage, provideStorage } from '@angular/fire/storage';
 import { ProjectComponent } from './components/project/project.component';
+import { BacklogComponent } from './components/backlog/backlog.component';
 
 @NgModule({
   declarations: [
@@ -22,6 +23,7 @@ import { ProjectComponent } from './components/project/project.component';
     NavbarComponent,
     FooterComponent,
     ProjectComponent,
+    BacklogComponent,
     provideFirebaseApp(() => initializeApp(environment.firebase)),
     provideFirestore(() => getFirestore()),
     provideAuth(() => getAuth()),
