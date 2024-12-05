@@ -13,10 +13,12 @@ import { getStorage, provideStorage } from '@angular/fire/storage';
 import { ProjectComponent } from './components/project/project.component';
 import { BacklogComponent } from './components/backlog/backlog.component';
 import { CreateUserStoryComponent } from './components/create-user-story/create-user-story.component';
+import { ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    CreateUserStoryComponent,
   ],
   imports: [
     BrowserModule,
@@ -25,7 +27,7 @@ import { CreateUserStoryComponent } from './components/create-user-story/create-
     FooterComponent,
     ProjectComponent,
     BacklogComponent,
-    CreateUserStoryComponent,
+    ReactiveFormsModule,
     provideFirebaseApp(() => initializeApp(environment.firebase)),
     provideFirestore(() => getFirestore()),
     provideAuth(() => getAuth()),

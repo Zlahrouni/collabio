@@ -1,91 +1,124 @@
 <div class="create-user-story-container">
-    <div class="user-story-header">
-      <h1>Créer une User Story</h1>
-      <div class="header-actions">
-        <button class="btn btn-cancel">Annuler</button>
-        <button class="btn btn-primary">Créer</button>
+  <div class="user-story-header">
+    <h1>Créer une User Story</h1>
+    <div class="header-actions">
+      <button 
+        class="btn btn-cancel" 
+        (click)="onCancel()"
+        [disabled]="isSubmitting"
+      >
+        Annuler
+      </button>
+      <button 
+        class="btn btn-primary" 
+        (click)="onSubmit()" 
+        [disabled]="userStoryForm.invalid || isSubmitting"
+      >
+        {{ isSubmitting ? 'Création en cours...' : 'Créer' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Affichage des erreurs globales -->
+  <div *ngIf="submitError" class="alert alert-danger">
+    {{ submitError }}
+  </div>
+
+  <form [formGroup]="userStoryForm" class="user-story-form">
+    <div class="form-section">
+      <div class="form-group">
+        <label>Titre de la User Story</label>
+        <input 
+          type="text" 
+          formControlName="title"
+          placeholder="Décrivez brièvement la fonctionnalité"
+          class="form-control"
+          [class.is-invalid]="isFieldInvalid('title')"
+        >
+        <div *ngIf="isFieldInvalid('title')" class="invalid-feedback">
+          {{ getErrorMessage('title') }}
+        </div>
+      </div>
+
+      <div class="form-group description-group">
+        <label>Description</label>
+        <textarea 
+          formControlName="description"
+          placeholder="Détaillez la user story, les critères d'acceptance, etc."
+          class="form-control description-input"
+          [class.is-invalid]="isFieldInvalid('description')"
+        ></textarea>
+        <div *ngIf="isFieldInvalid('description')" class="invalid-feedback">
+          {{ getErrorMessage('description') }}
+        </div>
       </div>
     </div>
-  
-    <form class="user-story-form">
-      <div class="form-section">
+
+    <div class="form-section metadata-section">
+      <div class="form-row">
         <div class="form-group">
-          <label>Titre de la User Story</label>
-          <input 
-            type="text" 
-            placeholder="Décrivez brièvement la fonctionnalité"
+          <label>Type</label>
+          <select 
+            formControlName="type" 
             class="form-control"
+            [class.is-invalid]="isFieldInvalid('type')"
           >
-        </div>
-  
-        <div class="form-group description-group">
-          <label>Description</label>
-          <textarea 
-            placeholder="Détaillez la user story, les critères d'acceptance, etc."
-            class="form-control description-input"
-          ></textarea>
-        </div>
-      </div>
-  
-      <div class="form-section metadata-section">
-        <div class="form-row">
-          <div class="form-group">
-            <label>Type</label>
-            <select class="form-control">
-              <option>Fonctionnalité</option>
-              <option>Amélioration</option>
-              <option>Correction de bug</option>
-            </select>
-          </div>
-  
-          <div class="form-group">
-            <label>Priorité</label>
-            <select class="form-control">
-              <option>Faible</option>
-              <option>Moyenne</option>
-              <option>Haute</option>
-              <option>Critique</option>
-            </select>
+            <option *ngFor="let type of types" [value]="type">{{type}}</option>
+          </select>
+          <div *ngIf="isFieldInvalid('type')" class="invalid-feedback">
+            {{ getErrorMessage('type') }}
           </div>
         </div>
-  
-        <div class="form-row">
-          <div class="form-group">
-            <label>Points de Story</label>
-            <select class="form-control">
-              <option>1</option>
-              <option>2</option>
-              <option>3</option>
-              <option>5</option>
-              <option>8</option>
-              <option>13</option>
-            </select>
-          </div>
-  
-          <div class="form-group">
-            <label>Assigné</label>
-            <select class="form-control">
-              <option>Jean Dupont</option>
-              <option>Marie Martin</option>
-              <option>Pierre Dubois</option>
-            </select>
+
+        <div class="form-group">
+          <label>Statut</label>
+          <select 
+            formControlName="status" 
+            class="form-control"
+            [class.is-invalid]="isFieldInvalid('status')"
+          >
+            <option *ngFor="let stat of status" [value]="stat">{{stat}}</option>
+          </select>
+          <div *ngIf="isFieldInvalid('status')" class="invalid-feedback">
+            {{ getErrorMessage('status') }}
           </div>
         </div>
       </div>
-  
-      <div class="form-section acceptance-criteria">
-        <h3>Critères d'Acceptance</h3>
-        <div class="criteria-list">
-          <div class="criteria-item">
-            <input type="text" placeholder="Ajouter un critère d'acceptance" class="form-control">
-            <button class="btn-remove">✖</button>
-          </div>
-          <div class="criteria-item">
-            <input type="text" placeholder="Ajouter un critère d'acceptance" class="form-control">
-            <button class="btn-remove">✖</button>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Points de Story</label>
+          <select 
+            formControlName="storyPoints" 
+            class="form-control"
+            [class.is-invalid]="isFieldInvalid('storyPoints')"
+          >
+            <option *ngFor="let points of storyPoints" [value]="points">{{points}}</option>
+          </select>
+          <div *ngIf="isFieldInvalid('storyPoints')" class="invalid-feedback">
+            {{ getErrorMessage('storyPoints') }}
           </div>
         </div>
-        <button class="btn btn-secondary add-criteria">+ Ajouter un critère</button>
+
+        <div class="form-group">
+          <label>Assigné</label>
+          <select
+            class="form-control"
+            [class.is-invalid]="isFieldInvalid('assignedTo')"
+          >
+            <option value="">Sélectionnez un utilisateur</option>
+            <!--option 
+              *ngFor="let user of users$ | async" 
+              [value]="user.id"
+            >
+              {{user.name}}
+            </-option-->
+          </select>
+          <div *ngIf="isFieldInvalid('assignedTo')" class="invalid-feedback">
+            {{ getErrorMessage('assignedTo') }}
+          </div>
+        </div>
       </div>
-    </form>
-  </div>
+    </div>
+  </form>
+</div>
