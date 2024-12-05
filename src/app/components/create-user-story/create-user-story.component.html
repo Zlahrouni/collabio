@@ -1,0 +1,91 @@
+<div class="create-user-story-container">
+    <div class="user-story-header">
+      <h1>Créer une User Story</h1>
+      <div class="header-actions">
+        <button class="btn btn-cancel">Annuler</button>
+        <button class="btn btn-primary">Créer</button>
+      </div>
+    </div>
+  
+    <form class="user-story-form">
+      <div class="form-section">
+        <div class="form-group">
+          <label>Titre de la User Story</label>
+          <input 
+            type="text" 
+            placeholder="Décrivez brièvement la fonctionnalité"
+            class="form-control"
+          >
+        </div>
+  
+        <div class="form-group description-group">
+          <label>Description</label>
+          <textarea 
+            placeholder="Détaillez la user story, les critères d'acceptance, etc."
+            class="form-control description-input"
+          ></textarea>
+        </div>
+      </div>
+  
+      <div class="form-section metadata-section">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Type</label>
+            <select class="form-control">
+              <option>Fonctionnalité</option>
+              <option>Amélioration</option>
+              <option>Correction de bug</option>
+            </select>
+          </div>
+  
+          <div class="form-group">
+            <label>Priorité</label>
+            <select class="form-control">
+              <option>Faible</option>
+              <option>Moyenne</option>
+              <option>Haute</option>
+              <option>Critique</option>
+            </select>
+          </div>
+        </div>
+  
+        <div class="form-row">
+          <div class="form-group">
+            <label>Points de Story</label>
+            <select class="form-control">
+              <option>1</option>
+              <option>2</option>
+              <option>3</option>
+              <option>5</option>
+              <option>8</option>
+              <option>13</option>
+            </select>
+          </div>
+  
+          <div class="form-group">
+            <label>Assigné</label>
+            <select class="form-control">
+              <option>Jean Dupont</option>
+              <option>Marie Martin</option>
+              <option>Pierre Dubois</option>
+            </select>
+          </div>
+        </div>
+      </div>
+  
+      <div class="form-section acceptance-criteria">
+        <h3>Critères d'Acceptance</h3>
+        <div class="criteria-list">
+          <div class="criteria-item">
+            <input type="text" placeholder="Ajouter un critère d'acceptance" class="form-control">
+            <button class="btn-remove">✖</button>
+          </div>
+          <div class="criteria-item">
+            <input type="text" placeholder="Ajouter un critère d'acceptance" class="form-control">
+            <button class="btn-remove">✖</button>
+          </div>
+        </div>
+        <button class="btn btn-secondary add-criteria">+ Ajouter un critère</button>
+      </div>
+    </form>
+  </div>

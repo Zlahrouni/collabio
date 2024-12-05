@@ -6,13 +6,15 @@ import {SigninComponent} from "./components/signin/signin.component";
 import {AuthGuard, NoAuthGuard} from "./services/auth.guard.service";
 import { ProjectComponent } from './components/project/project.component';
 import { BacklogComponent } from './components/backlog/backlog.component';
+import { CreateUserStoryComponent } from './components/create-user-story/create-user-story.component';
 
 const routes: Routes = [
   {path: '', component: HomeComponent, canActivate: [AuthGuard]},
   {path: 'register', component: SignupComponent, canActivate: [NoAuthGuard]},
   {path: 'login', component: SigninComponent, canActivate: [NoAuthGuard]},
-  {path: 'projects', component: ProjectComponent, canActivate: [AuthGuard]},
-  {path: 'US', component: BacklogComponent, canActivate: [AuthGuard]},
+  {path: 'project', component: ProjectComponent, canActivate: [AuthGuard]},
+  {path: 'backlog', component: BacklogComponent, canActivate: [AuthGuard]},
+  {path: 'create-US', component: CreateUserStoryComponent, canActivate: [AuthGuard]}
 ];
 
 @NgModule({

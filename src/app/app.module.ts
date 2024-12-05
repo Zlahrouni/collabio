@@ -12,6 +12,7 @@ import { getAuth, provideAuth } from '@angular/fire/auth';
 import { getStorage, provideStorage } from '@angular/fire/storage';
 import { ProjectComponent } from './components/project/project.component';
 import { BacklogComponent } from './components/backlog/backlog.component';
+import { CreateUserStoryComponent } from './components/create-user-story/create-user-story.component';
 
 @NgModule({
   declarations: [
@@ -24,6 +25,7 @@ import { BacklogComponent } from './components/backlog/backlog.component';
     FooterComponent,
     ProjectComponent,
     BacklogComponent,
+    CreateUserStoryComponent,
     provideFirebaseApp(() => initializeApp(environment.firebase)),
     provideFirestore(() => getFirestore()),
     provideAuth(() => getAuth()),
