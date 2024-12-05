@@ -28,12 +28,14 @@ export class SignupComponent implements OnInit {
   ngOnInit() {
     this.registerForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
+      username: ['', [Validators.required, Validators.minLength(6)]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       confirmPassword: ['', [Validators.required]]
     }, { validator: SignupComponent.matchPasswords });
   }
 
   get email() { return this.registerForm.get('email'); }
+  get username() { return this.registerForm.get('username'); }
   get password() { return this.registerForm.get('password'); }
   get confirmPassword() { return this.registerForm.get('confirmPassword'); }
 
@@ -63,8 +65,8 @@ export class SignupComponent implements OnInit {
 
     if (this.registerForm.valid) {
       try {
-        const { email, password } = this.registerForm.value;
-        await this.authService.register(email, password);
+        const { email, password, username } = this.registerForm.value;
+        await this.authService.register(email, password, username);
         await this.router.navigate(['']);
       } catch (error) {
         console.error('Erreur d\'inscription:', error);
