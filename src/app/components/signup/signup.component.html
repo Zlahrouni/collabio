@@ -18,6 +18,7 @@
 
   <div class="mt-5 sm:mx-auto sm:w-full sm:max-w-sm">
     <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="space-y-6">
+
       <div>
         <label for="email" class="block text-sm/6 font-medium text-gray-900">Email Address</label>
         <div class="mt-2">
@@ -27,6 +28,17 @@
         <div *ngIf="email?.invalid && (email?.dirty || email?.touched)" class="text-red-500 text-sm mt-1">
           <div *ngIf="email?.errors?.['required']">Email is required</div>
           <div *ngIf="email?.errors?.['email']">Invalid email address</div>
+        </div>
+      </div>
+
+      <div>
+        <label for="username" class="block text-sm/6 font-medium text-gray-900">Username</label>
+        <div class="mt-2">
+          <input id="username" formControlName="username" type="text" autocomplete="username" required 
+            class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6">
+        </div>
+        <div *ngIf="username?.invalid && (username?.dirty || username?.touched)" class="text-red-500 text-sm mt-1">
+          <div *ngIf="username?.errors?.['required']">Username is required</div>
         </div>
       </div>
 
@@ -45,7 +57,7 @@
       <div>
           <label for="confirmPassword" class="block text-sm/6 font-medium text-gray-900">Confirm Password</label>
           <div class="mt-2">
-              <input id="confirmPassword" formControlName="confirmPassword" type="password" required 
+              <input id="confirmPassword" formControlName="confirmPassword" type="password" autocomplete="confirm-password" required 
               class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6">
           </div>
           <div *ngIf="confirmPassword?.invalid && (confirmPassword?.dirty || confirmPassword?.touched)" class="text-red-500 text-sm mt-1">
