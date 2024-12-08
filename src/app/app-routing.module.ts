@@ -13,7 +13,6 @@ const routes: Routes = [
   {path: 'register', component: SignupComponent, canActivate: [NoAuthGuard]},
   {path: 'login', component: SigninComponent, canActivate: [NoAuthGuard]},
   {path: 'project', component: ProjectComponent, canActivate: [AuthGuard]},
-  {path: 'backlog', component: BacklogComponent, canActivate: [AuthGuard]},
   {path: 'create-US', component: CreateUserStoryComponent, canActivate: [AuthGuard]}
 ];
 

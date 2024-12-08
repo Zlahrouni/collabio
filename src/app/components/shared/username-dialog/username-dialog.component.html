@@ -9,6 +9,11 @@
             formControlName="username"
             class="w-full border rounded p-2"
           >
+          <div
+            *ngIf="usernameForm.get('username')?.invalid && usernameForm.get('username')?.touched"
+            class="text-red-500 text-sm">
+            Username already exists
+          </div>
         </div>
         <div class="flex justify-end gap-2">
           <button

@@ -1,1 +1,131 @@
-<p>home works!</p>
+<button (click)="openModal()" class="bg-blue-300 rounded px-2">Create a new Project</button>
+
+<clb-modal
+  [isOpen]="createProjectModalOpen"
+  (closeModal)="closeModal()"
+  title="Create Project"
+>
+  <div class="container mx-auto p-6">
+    <h1 class="text-2xl font-bold mb-6">Create New Project</h1>
+    <div *ngIf="this.errors.length > 0">
+      <span class="text-red-500">Your form contains some errors. Please fix them before submitting.</span>
+      <div
+        *ngFor="let error of errors"
+        class="text-red-500"
+      >
+        {{error}}
+      </div>
+    </div>
+    <form [formGroup]="projectForm" (ngSubmit)="onSubmit()" class="space-y-4">
+      <div>
+        <label class="block mb-2">Project Name *</label>
+        <input
+          formControlName="name"
+          class="w-full p-2 border rounded"
+          placeholder="Enter project name"
+        >
+      </div>
+
+      <div>
+        <label class="block mb-2">Description</label>
+        <textarea
+          formControlName="description"
+          class="w-full p-2 border rounded"
+          placeholder="Enter project description"
+        ></textarea>
+      </div>
+
+      <div>
+        <label class="block mb-2">Budget for this project ($)</label>
+        <input
+          type="number"
+          formControlName="budget"
+          class="w-full p-2 border rounded"
+          placeholder="Enter your budget for this project"
+        />
+      </div>
+
+      <div>
+        <label class="block mb-2">Added Users</label>
+        <div class="flex flex-wrap gap-2 mb-2">
+            <div *ngIf="selectedUsers.length > 0">
+              <span
+                *ngFor="let user of selectedUsers"
+                class="bg-blue-100 px-2 py-1 rounded-full flex items-center text-sm"
+                >
+                {{ user }}
+                  <button
+                    (click)="removeUser(user)"
+                    class="ml-2 text-red-500 hover:text-red-700"
+                  >
+                  ×
+                </button>
+              </span>
+            </div>
+            <div *ngIf="selectedUsers.length === 0">
+              <span class="text-gray-500">No users added yet</span>
+            </div>
+        </div>
+      </div>
+
+      <div>
+        <label class="block mb-2">Add Users</label>
+        <div class="flex">
+          <input
+            type="text"
+            class="block w-full max-w-md py-2 px-3 text-gray-900 rounded border border-gray-100 focus:outline-none focus:border-blue-500 dark:bg-gray-800 dark:text-white dark:border-gray-700"
+            placeholder="Search..."
+            (focus)="onFocus()"
+            (blur)="onBlur()"
+            (input)="searchUsers($event)"
+          />
+          <button
+            type="button"
+            class="bg-blue-500 text-white px-4 rounded-r"
+          >
+            Search
+          </button>
+        </div>
+
+        <div
+          *ngIf="isFocused && filteredUsers.length > 0"
+          class="mt-2 border rounded shadow-lg"
+        >
+          <div
+            *ngFor="let user of filteredUsers"
+            class="flex items-center justify-between p-2 border-b hover:bg-gray-100 cursor-pointer"
+            (mousedown)="addUser(user)"
+          >
+            <div>
+              <div class="font-medium">{{ user }}</div>
+<!--              <div class="text-sm text-gray-500">this is the users</div>-->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button
+        type="submit"
+        [disabled]="projectForm.invalid"
+        class="bg-blue-600 text-white p-2 rounded hover:bg-blue-700 disabled:opacity-50"
+      >
+        Create Project
+      </button>
+    </form>
+  </div>
+</clb-modal>
+
+<div class="container mx-auto p-6">
+  <h1 class="text-2xl font-bold mb-6">Projects</h1>
+  <div class="grid grid-cols-3 gap-4">
+    <div
+      *ngFor="let project of projects"
+      class="bg-white p-4 rounded shadow"
+    >
+      <h2 class="text-lg font-bold">{{ project.name }}</h2>
+      <p class="text-gray-500">{{ project.description }}</p>
+      <p class="text-gray-500">Budget: ${{ project.budget }}</p>
+      <p class="text-gray-500">Users: {{ project.users?.join(', ') }}</p>
+    </div>
+  </div>
+</div>

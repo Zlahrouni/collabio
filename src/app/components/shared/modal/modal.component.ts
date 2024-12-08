@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+// modal.component.ts
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -9,5 +10,12 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./modal.component.scss']
 })
 export class ModalComponent {
+  @Input() isOpen = false;
+  @Input() title = 'Modal Title';
+  @Output() closeModal = new EventEmitter<void>();
 
+  onClose() {
+    this.isOpen = false;
+    this.closeModal.emit();
+  }
 }

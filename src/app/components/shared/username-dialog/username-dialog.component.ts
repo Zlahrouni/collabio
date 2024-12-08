@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { DialogRef } from '@angular/cdk/dialog';
 import { CommonModule } from '@angular/common';
+import {UserService} from "../../../services/user.service";
 
 @Component({
   selector: 'clb-username-dialog',
@@ -20,7 +21,8 @@ export class UsernameDialogComponent {
 
   constructor(
     private fb: FormBuilder,
-    public dialogRef: DialogRef<string>
+    public dialogRef: DialogRef<string>,
+    private readonly userService: UserService
   ) {
     this.usernameForm = this.fb.group({
       username: ['', [Validators.required, Validators.minLength(3)]]
@@ -29,7 +31,21 @@ export class UsernameDialogComponent {
 
   onSubmit() {
     if (this.usernameForm.valid) {
-      this.dialogRef.close(this.usernameForm.value.username);
+      this.userService.getUserByUsername(this.usernameForm.value.username).subscribe(
+        {
+          next: (user) => {
+            if (user) {
+              this.usernameForm.get('username')?.setErrors({usernameExists: true});
+            } else {
+              this.dialogRef.close(this.usernameForm.value.username);
+            }
+          },
+          error: (error) => {
+            console.error('Error fetching user : ', error);
+          }
+        }
+      );
+
     }
   }
 }
