@@ -34,7 +34,11 @@ export class UserService {
     return from(setDoc(userDocRef, user)).pipe(
       switchMap(() => docData(userDocRef).pipe(
         map(userData => ({id: docId, ...userData} as User)),
-        tap(user => this.saveUserToLocalStorage(user))
+        tap(user => {
+          console.log('User added and saved:', user);
+          this.saveUserToLocalStorage(user);
+        })
+          
       ))
     );
   }
@@ -71,8 +75,18 @@ export class UserService {
   getLocalUser(): User | undefined {
     if (!this.localUser$) {
       const user = localStorage.getItem('user');
+      console.log('Retrieved user from localStorage:', user);
+      
       if (user) {
-        this.localUser$ = JSON.parse(user);
+        try {
+          this.localUser$ = JSON.parse(user);
+          console.log('Parsed local user:', this.localUser$);
+        } catch (error) {
+          console.error('Error parsing user from localStorage:', error);
+          return undefined;
+        }
+      } else {
+        console.log('No user found in localStorage');
       }
     }
     return this.localUser$;

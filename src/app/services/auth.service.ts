@@ -32,21 +32,26 @@ export class AuthService {
     try {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(this.auth, provider);
-      const userExist = await firstValueFrom(this.userService.getUserByIdDoc(result.user.uid)).then(user => {
-        console.log('User exist:', user)
-        return
-      });
-      if (userExist === undefined) {
+      const userExist = await firstValueFrom(this.userService.getUserByIdDoc(result.user.uid));
+
+      console.log('User exist:', userExist);
+
+      if (!userExist) {
         const username = await this.showUsernameDialog();
         if (!username) {
           await this.logout();
           throw new Error('Username is required to complete registration');
         }
-        return await firstValueFrom(this.userService.addUser(result.user.uid, username, result.user.email!));
+        const newUser = await firstValueFrom(this.userService.addUser(result.user.uid, username, result.user.email!));
+        this.userService.saveUserToLocalStorage(newUser);
+
+        return newUser;
       } else {
+        this.userService.saveUserToLocalStorage(userExist);
         return userExist;
       }
     } catch (error) {
+      console.error('Google login error:', error);
       throw error;
     }
   }
