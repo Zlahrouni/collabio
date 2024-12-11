@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { CollectionReference, Firestore, collection, addDoc, docData, DocumentReference } from '@angular/fire/firestore';
+import { CollectionReference, Firestore, collection, addDoc, docData, DocumentReference, collectionData } from '@angular/fire/firestore';
 import { UserStory } from '../models/userStory';
 import { from, map, Observable, switchMap } from 'rxjs';
 
@@ -18,5 +18,11 @@ export class UserStoryService {
         map(userStory => ({ id: docRef.id, ...userStory } as UserStory))
       ))
     );
+  }
+
+  getUserStories() {
+    const allUS = collectionData(this.userStoriesCollection);
+    console.log('userStoriesCollection', allUS);
+    return allUS;
   }
 }
