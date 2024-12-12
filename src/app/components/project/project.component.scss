@@ -14,163 +14,101 @@ $border-color: #DFE1E6;
     border-bottom: 1px solid $border-color;
 
     .project-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       h1 {
         margin: 0;
         font-size: 24px;
         color: $secondary-color;
-      }
-
-      .project-meta {
-        display: flex;
-        align-items: center;
-        margin-top: 5px;
-        color: $secondary-color;
-
-        .project-key {
-          font-weight: bold;
-          margin-right: 10px;
-          opacity: 0.7;
-        }
-
-        .project-type {
-          opacity: 0.6;
-          margin-right: 60em;
-        }
-      }
-    }
-
-    .project-actions {
-      .btn {
-        margin-left: 10px;
-        padding: 8px 16px;
-        border-radius: 3px;
-        border: none;
-        cursor: pointer;
-
-        &.btn-primary {
-          background-color: $primary-color;
-          color: white;
-          text-transform: capitalize;
-        }
-      }
-    }
-  }
-
-  .project-navigation {
-    background-color: white;
-    border-bottom: 1px solid $border-color;
-
-    ul {
-      display: flex;
-      list-style: none;
-      padding: 0;
-      margin: 0;
-
-      li {
-        padding: 15px 20px;
-        cursor: pointer;
-        transition: background-color 0.3s;
-
-        a {
-          text-decoration: none;
-          color: $secondary-color;
-          font-weight: 500;
-        }
-
-        &.active {
-          border-bottom: 3px solid $primary-color;
-
-          a {
-            color: $primary-color;
-          }
-        }
-
-        &:hover {
-          background-color: rgba(9, 30, 66, 0.04);
-        }
       }
     }
   }
 
   .project-content {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     gap: 20px;
     padding: 20px;
 
-    .project-summary {
-      .summary-card {
-        background-color: white;
-        border-radius: 3px;
-        border: 1px solid $border-color;
-        padding: 15px;
-
-        h3 {
-          margin-top: 0;
-          color: $secondary-color;
-        }
-
-        .status-indicators {
-          display: flex;
-          justify-content: space-between;
-
-          .status-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-
-            .status-label {
-              color: $secondary-color;
-              font-size: 12px;
-              margin-bottom: 5px;
-            }
-
-            .status-count {
-              font-weight: bold;
-              font-size: 18px;
-            }
-          }
-        }
-      }
-    }
-
-    .project-recent-activity {
+    .summary-card,
+    .project-description,
+    .project-budget,
+    .project-participants,
+    .project-recent-Participants {
       background-color: white;
-      border-radius: 3px;
+      border-radius: 8px;
       border: 1px solid $border-color;
       padding: 15px;
 
       h2 {
         margin-top: 0;
         color: $secondary-color;
-        font-size: 16px;
+        font-size: 18px;
       }
 
-      .activity-list {
-        .activity-item {
-          display: flex;
-          align-items: center;
-          padding: 10px 0;
-          border-bottom: 1px solid $border-color;
+      p {
+        color: $secondary-color;
+      }
 
-          &:last-child {
-            border-bottom: none;
+      ul {
+        padding: 0;
+        margin: 0;
+        list-style: none;
+
+        li {
+          padding: 5px 0;
+          color: $secondary-color;
+        }
+      }
+    }
+
+    .status-indicators {
+      display: flex;
+      justify-content: space-between;
+
+      .status-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        .status-label {
+          color: $secondary-color;
+          font-size: 12px;
+          margin-bottom: 5px;
+        }
+
+        .status-count {
+          font-weight: bold;
+          font-size: 18px;
+        }
+      }
+    }
+
+    .Participants-list {
+      .Participants-item {
+        display: flex;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid $border-color;
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        .Participants-icon {
+          margin-right: 15px;
+          font-size: 24px;
+        }
+
+        .Participants-details {
+          p {
+            margin: 0;
+            color: $secondary-color;
           }
 
-          .activity-icon {
-            margin-right: 15px;
-            font-size: 24px;
-          }
-
-          .activity-details {
-            p {
-              margin: 0;
-              color: $secondary-color;
-            }
-
-            small {
-              color: lighten($secondary-color, 30%);
-            }
+          small {
+            color: lighten($secondary-color, 30%);
           }
         }
       }

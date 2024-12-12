@@ -4,13 +4,15 @@ import {
   collection,
   collectionData,
   CollectionReference,
+  doc,
+  setDoc,
   docData,
   DocumentReference,
-  Firestore
+  Firestore,
+  getDoc
 } from "@angular/fire/firestore";
 import {Project} from "../models/project";
-import {from, map, switchMap} from "rxjs";
-import {AuthService} from "./auth.service";
+import {catchError, from, map, Observable, of, switchMap} from "rxjs";
 import {UserService} from "./user.service";
 
 @Injectable({
@@ -23,22 +25,27 @@ export class ProjectService {
     this.projectCollection = collection(this.fireStore, 'projects') as CollectionReference<Project>;
   }
 
-  addProject(name: string, description: string, budget: number, users: string[]) {
+  addProject(project: Project, users: string[]): Observable<Project> {
     users.push(this.userService.getLocalUser()!.username!);
-    const project: Project = {
-      name,
-      description,
-      budget,
-      status: 'Started',
-      createdBy: this.userService.getLocalUser()!.username,
-      Date: new Date(),
-      tasks: [],
-      users
+    
+    // Use the existing project ID for the document
+    const projectDocRef = doc(this.projectCollection, project.id);
+
+    const projectToAdd: Project = {
+      ...project,
+      users,
+      createdBy: this.userService.getLocalUser()!.username!
     };
-    return from(addDoc(this.projectCollection, project)).pipe(
-      switchMap(docRef => docData(docRef as DocumentReference<Project>).pipe(
-        map(project => ({ id: docRef.id, ...project } as Project))
-      ))
+
+    return from(setDoc(projectDocRef, projectToAdd)).pipe(
+      map(() => ({
+        ...projectToAdd,
+        id: project.id
+      })),
+      catchError(error => {
+        console.error('Error adding project:', error);
+        throw error;
+      })
     );
   }
 
@@ -50,7 +57,49 @@ export class ProjectService {
     return collectionData(this.projectCollection).pipe(
       map(projects => {
         const user = this.userService.getLocalUser();
+        console.log('Current user:', user);
+        
+        if (!user) {
+          console.error('No local user found');
+          return []; 
+        }
+        
+        if (!user.username) {
+          console.error('User exists but has no username');
+          return [];
+        }
+        
         return projects.filter(project => project?.users?.includes(user!.username!));
+      })
+    );
+  }
+
+  getProjectById(id: string): Observable<Project | null> {
+    console.log('Fetching project with ID:', id);
+    
+    // Use doc() with correct collection and ID
+    const projectDocRef = doc(this.fireStore, 'projects', id);
+
+    return from(getDoc(projectDocRef)).pipe(
+      map(docSnapshot => {
+        console.log('Document snapshot exists:', docSnapshot.exists());
+        
+        if (docSnapshot.exists()) {
+          const projectData = docSnapshot.data() as Project;
+          console.log('Raw project data:', projectData);
+          
+          return {
+            ...projectData,
+            id: docSnapshot.id
+          };
+        }
+        
+        console.log('No project found with ID:', id);
+        return null;
+      }),
+      catchError(error => {
+        console.error('Error fetching project:', error);
+        return of(null);
       })
     );
   }

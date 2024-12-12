@@ -5,11 +5,13 @@ import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/
 import {Project} from "../../models/project";
 import {UserService} from "../../services/user.service";
 import {ProjectService} from "../../services/project.service";
+import { RouterModule } from '@angular/router';
+import { v4 as uuidv4 } from 'uuid';
 
 @Component({
   selector: 'clb-home',
   standalone: true,
-  imports: [CommonModule, ModalComponent, ReactiveFormsModule],
+  imports: [CommonModule, ModalComponent, ReactiveFormsModule, RouterModule],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })
@@ -113,14 +115,27 @@ export class HomeComponent implements OnInit {
 
   onSubmit() {
     if (this.projectForm.valid) {
-      const name = this.projectForm.get('name')?.value;
-      const description = this.projectForm.get('description')?.value;
-      const users = this.projectForm.get('users')?.value;
-      const budget = this.projectForm.get('budget')?.value;
-      this.projectService.addProject(name, description, budget, users).subscribe(
+      // Generate the project ID before creating the project
+      const projectId = uuidv4();
+      
+      const project: Project = {
+        id: projectId, // Use the pre-generated ID
+        name: this.projectForm.get('name')?.value,
+        description: this.projectForm.get('description')?.value,
+        budget: this.projectForm.get('budget')?.value,
+        users: [], 
+        createdBy: this.userService.getLocalUser()!.username!, 
+        createdAt: new Date() 
+      };
+      
+      const users = this.projectForm.get('users')?.value || [];
+      
+      this.projectService.addProject(project, users).subscribe(
         {
           next: (project: Project) => {
             console.log('Project Created:', project);
+            console.log('Project ID:', project.id);
+            this.projects.push(project); 
           },
           error: (error) => {
             console.error('Error creating project:', error);
@@ -148,4 +163,12 @@ export class HomeComponent implements OnInit {
       console.log('Errors : ', this.errors);
     }
   }
+
+  selectUser(user: string) {
+    if (!this.selectedUsers.includes(user)) {
+      this.selectedUsers.push(user);
+      this.searchUsers(); 
+    }
+  }
+  
 }

@@ -16,6 +16,8 @@ import { ProjectComponent } from './components/project/project.component';
 import { BacklogComponent } from './components/backlog/backlog.component';
 import { CreateUserStoryComponent } from './components/create-user-story/create-user-story.component';
 import { ReactiveFormsModule } from '@angular/forms';
+import { provideRouter } from '@angular/router';
+import { routes } from './app-routing.module';
 
 @NgModule({
   declarations: [
@@ -37,7 +39,7 @@ import { ReactiveFormsModule } from '@angular/forms';
     provideAuth(() => getAuth()),
     provideStorage(() => getStorage()),
   ],
-  providers: [],
+  providers: [provideRouter(routes)],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
