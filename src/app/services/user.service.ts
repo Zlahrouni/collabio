@@ -12,6 +12,7 @@ import {
 import {from, map, Observable, switchMap, tap} from "rxjs";
 import {User} from "../models/user";
 import {Project} from "../models/project";
+import {UserStory} from "../models/userStory";
 
 @Injectable({
   providedIn: 'root'
@@ -38,7 +39,7 @@ export class UserService {
           console.log('User added and saved:', user);
           this.saveUserToLocalStorage(user);
         })
-          
+
       ))
     );
   }
@@ -76,11 +77,10 @@ export class UserService {
     if (!this.localUser$) {
       const user = localStorage.getItem('user');
       console.log('Retrieved user from localStorage:', user);
-      
+
       if (user) {
         try {
           this.localUser$ = JSON.parse(user);
-          console.log('Parsed local user:', this.localUser$);
         } catch (error) {
           console.error('Error parsing user from localStorage:', error);
           return undefined;
@@ -91,4 +91,5 @@ export class UserService {
     }
     return this.localUser$;
   }
+
 }

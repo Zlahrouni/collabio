@@ -4,23 +4,27 @@ import { Router, RouterLink } from "@angular/router";
 import { AuthService } from 'src/app/services/auth.service';
 import { Observable } from 'rxjs';
 import { User } from '@angular/fire/auth';
+import {UserService} from "../../services/user.service";
+import {TruncatePipe} from "../../pipes/truncate.pipe";
 
 @Component({
   selector: 'clb-navbar',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, TruncatePipe],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.scss']
 })
 export class NavbarComponent implements OnInit, OnDestroy {
   user$: Observable<User | null>;
+  protected username?: string = 'Unknown user';
   private documentClickListener: any;
 
-  constructor(private authService: AuthService, private router: Router) {
+  constructor(private authService: AuthService, private readonly userService: UserService, private router: Router) {
     this.user$ = this.authService.user$;
   }
 
   ngOnInit(): void {
+    this.username = this.userService.getLocalUser()?.username;
     this.documentClickListener = (event: MouseEvent) => {
       const userMenuButton = document.getElementById('user-menu');
       const profileDropdown = document.getElementById('profile-dropdown');

@@ -1,9 +1,10 @@
 export interface UserStory {
-    id: number;
+    id?: string;
+    projectId: string;
     title: string;
     description: string;
-    status: 'Not started' | 'Pending' | 'Finish';
-    type: 'Fonctionnalité' | 'Amélioration' | 'Correction de bug';
+    status: string;
+    type: string;
     storyPoints: number;
     assignedTo: string;
     createdAt: string;

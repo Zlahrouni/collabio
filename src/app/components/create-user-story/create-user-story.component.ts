@@ -1,70 +1,68 @@
-import { Component, OnInit } from '@angular/core';
-import { User } from '@angular/fire/auth';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
-import { Observable } from 'rxjs';
-import { finalize } from 'rxjs/operators';
-import { UserStory } from 'src/app/models/userStory';
-import { AuthService } from 'src/app/services/auth.service';
-import { UserStoryService } from 'src/app/services/user-story.service';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+
+import {
+  AbstractControl, AsyncValidatorFn,
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  ValidationErrors,
+  ValidatorFn,
+  Validators
+} from '@angular/forms';
+
+import {NgForOf, NgIf} from "@angular/common";
+import {User} from "../../models/user";
+import {UserService} from "../../services/user.service";
+import {ProjectService} from "../../services/project.service";
+import {UserStoryService} from "../../services/user-story.service";
+import {TruncatePipe} from "../../pipes/truncate.pipe";
+import {catchError, map, Observable, of} from "rxjs";
 
 @Component({
-  selector: 'app-create-user-story',
+  selector: 'clb-create-user-story',
   templateUrl: './create-user-story.component.html',
+  standalone: true,
+  imports: [
+    ReactiveFormsModule,
+    NgIf,
+    NgForOf,
+    TruncatePipe
+  ],
   styleUrls: ['./create-user-story.component.scss']
 })
 export class CreateUserStoryComponent implements OnInit {
-  userStoryForm!: FormGroup;
-  //users$: Observable<User[]>;
-  
-  // Listes statiques basées sur le modèle UserStory
+  userStoryForm: FormGroup;
+  filteredUsers: string[] = [];
+  selectedUsers: string = '';
+  isFocused = false;
+  errorMessages: string[] = [];
+  @Input() projectId: string = '';
+  @Output() userStoryCreated: EventEmitter<void> = new EventEmitter<void>();
+
   types = [
-    'Fonctionnalité', 
-    'Amélioration', 
-    'Correction de bug'
+    'Functionality',
+    'Update',
+    'Bug fix',
   ];
 
-  status = [
-    'Not started', 
-    'Pending', 
-    'Finish'
-  ];
-
-  storyPoints = [1, 2, 3, 5, 8, 13];
-
-  // Gestion des états de formulaire
-  isSubmitting = false;
-  submitError: string | null = null;
 
   constructor(
-    private fb: FormBuilder, 
-    private userStoryService: UserStoryService,
-    private authService: AuthService,
-    private router: Router
-  ) {}
-
-  ngOnInit(): void {
-    // Initialiser le formulaire
-    this.initForm();
-
-    // Récupérer les utilisateurs de Firebase
-    //this.users$ = this.authService.getCurrentUser(); // Assuming getUsers() returns Observable<User[]>
-  }
-
-  initForm(): void {
+    private fb: FormBuilder,
+    private readonly projectService: ProjectService,
+    private readonly userStoryService: UserStoryService
+    ) {
     this.userStoryForm = this.fb.group({
       title: ['', [
-        Validators.required, 
+        Validators.required,
         Validators.minLength(3),
         Validators.maxLength(100)
-      ]],
+      ],],
       description: ['', [
         Validators.required,
         Validators.minLength(10),
         Validators.maxLength(500)
       ]],
-      type: ['Fonctionnalité', Validators.required],
-      status: ['Not started', Validators.required],
+      type: ['Functionality', Validators.required],
       storyPoints: [3, [
         Validators.required,
         Validators.min(1),
@@ -73,68 +71,124 @@ export class CreateUserStoryComponent implements OnInit {
     });
   }
 
-  // Méthode de validation personnalisée
-  isFieldInvalid(fieldValue: string): boolean {
-    const field = this.userStoryForm.get(fieldValue);
-    return field ? (field.invalid && (field.dirty || field.touched)) : false;
+  ngOnInit(): void {
+    console.log('Project ID:', this.projectId)
+    this.projectService.getUsernamesOfProject(this.projectId).subscribe(users => {
+      console.log('Users:', users)
+      this.filteredUsers = users;
+    });
   }
 
-  // Récupérer le message d'erreur spécifique
-  getErrorMessage(fieldValue: string): string {
-    const field = this.userStoryForm.get(fieldValue);
-    if (!field) return '';
+  onFocus(): void {
+    this.isFocused = true;
+  }
 
-    if (field.errors?.['required']) {
-      return 'Ce champ est obligatoire';
+  onBlur(): void {
+    this.isFocused = false;
+  }
+
+  searchUsers(event: Event): void {
+    const query = (event.target as HTMLInputElement).value.toLowerCase();
+    this.filteredUsers = this.filteredUsers.filter(user => user.toLowerCase().includes(query));
+  }
+
+  addUser(user: string): void {
+    this.selectedUsers = user;
+  }
+
+  removeUser(user: string): void {
+    if (this.selectedUsers === user) {
+      this.selectedUsers = '';
+      this.isFocused = false;
     }
-    if (field.errors?.['minlength']) {
-      return `Longueur minimale de ${field.errors['minlength'].requiredLength} caractères`;
-    }
-    if (field.errors?.['maxlength']) {
-      return `Longueur maximale de ${field.errors['maxlength'].requiredLength} caractères`;
-    }
-    return '';
   }
 
   onSubmit(): void {
-    // Marquer le formulaire comme touché pour afficher toutes les erreurs
-    this.userStoryForm.markAllAsTouched();
-
-    // Vérification finale de la validité du formulaire
-    if (this.userStoryForm.invalid) {
-      return;
-    }
-
-    // Désactiver le bouton et réinitialiser l'erreur
-    this.isSubmitting = true;
-    this.submitError = null;
-
-    const userStory: UserStory = {
-      ...this.userStoryForm.value,
-      id: 0, // L'ID sera généré par le backend
-      createdAt: new Date().toISOString() // Convertir en chaîne ISO
-    };
-
-    this.userStoryService.createUserStory(userStory)
-      .pipe(finalize(() => {
-        // Réactiver le bouton
-        this.isSubmitting = false;
-      }))
-      .subscribe({
-        next: () => {
-          // Redirection après création réussie
-          this.router.navigate(['/backlog']);
+    console.log('Form submitted')
+    this.errorMessages = [];
+    if (this.userStoryForm.valid) {
+      const title = this.userStoryForm.get('title')?.value;
+      const description = this.userStoryForm.get('description')?.value;
+      const type = this.userStoryForm.get('type')?.value;
+      const storyPoints = this.userStoryForm.get('storyPoints')?.value;
+      const assignedTo = this.selectedUsers;
+      console.log('Creating user story:', title, description, type, storyPoints, assignedTo)
+      this.userStoryService.createUserStory(this.projectId, title, description, type, storyPoints, assignedTo).subscribe({
+        next: (userStory) => {
+          console.log('User story added:', userStory);
+          this.userStoryCreated.emit()
+          this.userStoryForm.reset();
+          this.selectedUsers = '';
         },
         error: (error) => {
-          // Gestion des erreurs
-          console.error('Erreur lors de la création:', error);
-          this.submitError = 'Impossible de créer la user story. Veuillez réessayer.';
+          console.error('Error adding user story:', error);
         }
       });
-      console.log("the added US is: ", userStory);
+    } else {
+      Object.keys(this.userStoryForm.controls).forEach(key => {
+        const controlErrors = this.userStoryForm.get(key)?.errors;
+        if (controlErrors) {
+          Object.keys(controlErrors).forEach(errorKey => {
+            this.errorMessages.push(this.getErrorMessage(key, errorKey));
+          });
+        }
+      });
+
+      // Focus with a timeout to ensure the element is rendered
+      if (this.errorMessages.length > 0) {
+        setTimeout(() => {
+          const errorMessagesElement = document.getElementById('error-messages');
+          if (errorMessagesElement) {
+            errorMessagesElement.focus();
+          }
+        }, 0);
+      }
+    }
   }
 
-  onCancel(): void {
-    this.router.navigate(['/backlog']);
+  getErrorMessage(controlName: string, errorKey: string): string {
+    const errorMessages: { [key: string]: { [key: string]: string } } = {
+      title: {
+        required: 'Title is required',
+        minlength: 'Title must be at least 3 characters long',
+        maxlength: 'Title cannot be more than 100 characters long',
+        uniqueTitle: 'Title must be unique within the project'
+      },
+      description: {
+        required: 'Description is required',
+        minlength: 'Description must be at least 10 characters long',
+        maxlength: 'Description cannot be more than 500 characters long'
+      },
+      type: {
+        required: 'Type is required'
+      },
+      status: {
+        required: 'Status is required'
+      },
+      storyPoints: {
+        required: 'Story points are required',
+        min: 'Story points must be at least 1',
+        max: 'Story points cannot be more than 13'
+      }
+    };
+    return errorMessages[controlName][errorKey];
+  }
+
+  uniqueTitleValidator(): AsyncValidatorFn {
+    return (control: AbstractControl): Observable<ValidationErrors | null> => {
+      return this.userStoryService.getUserStories(this.projectId).pipe(
+        map(userStories => {
+          const isUnique = !userStories.some(userStory => userStory.title === control.value);
+          return isUnique ? null : { uniqueTitle: { value: control.value } };
+        }),
+        catchError(() => of(null))
+      );
+    };
+  }
+
+  resetForm(): void {
+    this.userStoryForm.reset();
+    this.selectedUsers = '';
+    this.errorMessages = [];
   }
 }

@@ -1,5 +1,5 @@
 // modal.component.ts
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import {Component, Input, Output, EventEmitter, OnChanges, SimpleChanges} from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -9,10 +9,20 @@ import { CommonModule } from '@angular/common';
   templateUrl: './modal.component.html',
   styleUrls: ['./modal.component.scss']
 })
-export class ModalComponent {
+export class ModalComponent implements OnChanges{
   @Input() isOpen = false;
   @Input() title = 'Modal Title';
   @Output() closeModal = new EventEmitter<void>();
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['isOpen']) {
+      if (this.isOpen) {
+        document.body.classList.add('overflow-hidden');
+      } else {
+        document.body.classList.remove('overflow-hidden');
+      }
+    }
+  }
 
   onClose() {
     this.isOpen = false;

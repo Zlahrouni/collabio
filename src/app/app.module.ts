@@ -22,7 +22,6 @@ import { routes } from './app-routing.module';
 @NgModule({
   declarations: [
     AppComponent,
-    CreateUserStoryComponent,
   ],
   imports: [
     BrowserModule,

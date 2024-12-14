@@ -15,7 +15,7 @@ export class ProjectComponent implements OnInit {
   project: Project | null = null;
 
   constructor(
-    private route: ActivatedRoute, 
+    private route: ActivatedRoute,
     private projectService: ProjectService
   ) { }
 
@@ -23,15 +23,14 @@ export class ProjectComponent implements OnInit {
     this.route.paramMap.subscribe(params => {
       const id = params.get('id');
       console.log('Extracted Route ID:', id);
-      
+
       if (id) {
         this.projectService.getProjectById(id).subscribe({
           next: (project) => {
             console.log('Fetched Project Full Details:', project);
-            
+
             if (project) {
               this.project = project;
-              console.log('Project set successfully:', this.project);
             } else {
               console.warn('No project found with the given ID');
             }

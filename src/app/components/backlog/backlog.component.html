@@ -1,48 +1,53 @@
 <div class="backlog-container">
-    <header class="backlog-header">
-      <div class="backlog-title">
-        <h2>Backlog du projet</h2>
-        <div class="backlog-actions">
-          <a class="btn btn-primary" href="/create-US">Créer User Story</a>
-        </div>
+  <div class="backlog-header">
+    <div class="backlog-title">
+      <h2>Backlog du projet</h2>
+      <div class="backlog-actions">
+        <button (click)="openCreatedUSModal()" class="bg-blue-300 rounded px-2">Create a user storie</button>
       </div>
-      
-      <div class="backlog-filters">
-        <div class="search-container">
-          <input type="text" placeholder="Rechercher des stories..." class="search-input">
-          <i class="search-icon">🔍</i>
-        </div>
-        <div class="filter-group">
-          <select class="filter-select">
-            <option>Tous les filtres</option>
-            <option>Par assigné</option>
-            <option>Par priorité</option>
-            <option>Par statut</option>
-          </select>
-        </div>
+    </div>
+
+    <clb-modal
+      [isOpen]="createUsModalOpen"
+      (closeModal)="closeCreatedUSModal()"
+      title="Create User Story"
+    >
+      <clb-create-user-story (userStoryCreated)="closeCreatedUSModal()" [projectId]="projectId"></clb-create-user-story>
+    </clb-modal>
+
+    <div class="backlog-filters">
+      <div class="search-container">
+        <input type="text" placeholder="Rechercher des stories..." class="search-input">
+        <i class="search-icon">🔍</i>
       </div>
-    </header>
-  
-    <main class="backlog-content">
-      <section class="backlog-stories">
-        <div *ngFor="let userStory of userStories" class="backlog-story-list">
-
-          <div class="story-item">
-            <div class="story-header">
-              <span class="story-key">{{userStory.title}}</span>
-              <div class="story-priority high">{{userStory.status}}</div>
-            </div>
-            <div class="story-details">
-              <h3>{{userStory.type}}</h3>
-              <p>{{userStory.description}}</p>
-            </div>
-            <div class="story-metadata">
-              <div class="story-assignee">👤 {{userStory.assignedTo}}</div>
-              <div class="story-points">{{userStory.storyPoints}}</div>
-            </div>
-          </div>
-
-        </div>
-      </section>
-    </main>
+    </div>
   </div>
+
+  <div *ngIf="userStories.length > 0">
+    <section class="backlog-stories space-y-4">
+      <div *ngFor="let userStory of userStories" class="backlog-story-list">
+        <div class="story-item p-4 bg-white rounded shadow-md flex justify-between items-center"  (click)="openUserStoryModal(userStory)">
+          <div class="flex items-center">
+            <div class="story-points bg-gray-200 rounded-full px-2 py-1 mr-2">{{userStory.storyPoints}}</div>
+            <span class="story-key font-semibold text-lg cursor-pointer" (click)="openUserStoryModal(userStory)">{{userStory.title}}</span>
+          </div>
+          <button (click)="deleteUserStory(userStory)" class="text-red-500 hover:text-red-700">
+            <img src="app/assets/icons/recycle-bin.png" alt="Delete" class="w-4 h-4 hover:recycle-bin-open">
+          </button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div *ngIf="userStories.length === 0">
+    <p class="text-gray-500">Create your first user story.</p>
+  </div>
+
+  <clb-modal
+    [isOpen]="userStoryModalOpen"
+    (closeModal)="closeUserStoryModal()"
+    title="User Story Details"
+  >
+    <clb-user-story-details [userStory]="selectedUserStory"></clb-user-story-details>
+  </clb-modal>
+</div>
