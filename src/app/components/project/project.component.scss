@@ -1,0 +1,117 @@
+$primary-color: #0052CC;
+$secondary-color: #42526E;
+$background-light: #F4F5F7;
+$border-color: #DFE1E6;
+
+.project-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  background-color: $background-light;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+
+  .project-header {
+    padding: 20px;
+    border-bottom: 1px solid $border-color;
+
+    .project-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      h1 {
+        margin: 0;
+        font-size: 24px;
+        color: $secondary-color;
+      }
+    }
+  }
+
+  .project-content {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 20px;
+
+    .summary-card,
+    .project-description,
+    .project-budget,
+    .project-participants,
+    .project-recent-Participants {
+      background-color: white;
+      border-radius: 8px;
+      border: 1px solid $border-color;
+      padding: 15px;
+
+      h2 {
+        margin-top: 0;
+        color: $secondary-color;
+        font-size: 18px;
+      }
+
+      p {
+        color: $secondary-color;
+      }
+
+      ul {
+        padding: 0;
+        margin: 0;
+        list-style: none;
+
+        li {
+          padding: 5px 0;
+          color: $secondary-color;
+        }
+      }
+    }
+
+    .status-indicators {
+      display: flex;
+      justify-content: space-between;
+
+      .status-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        .status-label {
+          color: $secondary-color;
+          font-size: 12px;
+          margin-bottom: 5px;
+        }
+
+        .status-count {
+          font-weight: bold;
+          font-size: 18px;
+        }
+      }
+    }
+
+    .Participants-list {
+      .Participants-item {
+        display: flex;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid $border-color;
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        .Participants-icon {
+          margin-right: 15px;
+          font-size: 24px;
+        }
+
+        .Participants-details {
+          p {
+            margin: 0;
+            color: $secondary-color;
+          }
+
+          small {
+            color: lighten($secondary-color, 30%);
+          }
+        }
+      }
+    }
+  }
+}

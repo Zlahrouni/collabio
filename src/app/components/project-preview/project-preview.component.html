@@ -1,0 +1,15 @@
+<div
+  *ngIf="project"
+  class="bg-white p-4 rounded shadow relative transform transition-transform duration-300 hover:scale-105"
+  [routerLink]="['/project', project.id]"
+>
+  <button
+    (click)="onDeleteProject($event)"
+    class="absolute top-2 right-2 text-red-500 hover:text-red-700"
+  >
+    ×
+  </button>
+  <h2 class="text-lg font-bold">{{ project.name | truncate: 20 }}</h2>
+  <p class="text-gray-500">{{ project.description.trim() === '' ? '(No description)' : project.description | truncate: 40}}</p>
+  <p class="text-gray-500">Budget: {{ project.budget }}$</p>
+</div>

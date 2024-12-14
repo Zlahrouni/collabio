@@ -8,10 +8,11 @@ import {
   signOut,
   user
 } from '@angular/fire/auth';
-import { Firestore, doc, getDoc, setDoc } from '@angular/fire/firestore';
-import { Dialog } from '@angular/cdk/dialog';
-import { UsernameDialogComponent } from '../components/shared/username-dialog/username-dialog.component';
-import { firstValueFrom } from 'rxjs';
+import {doc, Firestore, getDoc} from '@angular/fire/firestore';
+import {Dialog} from '@angular/cdk/dialog';
+import {UsernameDialogComponent} from '../components/shared/username-dialog/username-dialog.component';
+import {firstValueFrom} from 'rxjs';
+import {UserService} from "./user.service";
 
 @Injectable({
   providedIn: 'root'
@@ -20,9 +21,10 @@ export class AuthService {
   user$ = user(this.auth);
 
   constructor(
-    private auth: Auth, 
+    private auth: Auth,
     private firestore: Firestore,
-    private dialog: Dialog
+    private dialog: Dialog,
+    private readonly userService: UserService
   ) {}
 
   // Connexion avec Google
@@ -30,23 +32,26 @@ export class AuthService {
     try {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(this.auth, provider);
-      const userDoc = await getDoc(doc(this.firestore, 'users', result.user.uid));
-      console.log(userDoc)
-      if (!userDoc.exists()) {
+      const userExist = await firstValueFrom(this.userService.getUserByIdDoc(result.user.uid));
+
+      console.log('User exist:', userExist);
+
+      if (!userExist) {
         const username = await this.showUsernameDialog();
         if (!username) {
           await this.logout();
           throw new Error('Username is required to complete registration');
         }
-        await setDoc(doc(this.firestore, 'users', result.user.uid), {
-          email: result.user.email,
-          username: username,
-          createdAt: new Date()
-        });
+        const newUser = await firstValueFrom(this.userService.addUser(result.user.uid, username, result.user.email!));
+        this.userService.saveUserToLocalStorage(newUser);
+
+        return newUser;
+      } else {
+        this.userService.saveUserToLocalStorage(userExist);
+        return userExist;
       }
-      
-      return result;
     } catch (error) {
+      console.error('Google login error:', error);
       throw error;
     }
   }
@@ -59,8 +64,7 @@ export class AuthService {
   // Connexion avec email/password
   async login(email: string, password: string) {
     try {
-      const result = await signInWithEmailAndPassword(this.auth, email, password);
-      return result;
+      return await signInWithEmailAndPassword(this.auth, email, password);
     } catch (error) {
       throw error;
     }
@@ -70,12 +74,7 @@ export class AuthService {
   async register(email: string, password: string, username: string) {
     try {
       const result = await createUserWithEmailAndPassword(this.auth, email, password);
-      await setDoc(doc(this.firestore, 'users', result.user.uid), {
-        email,
-        username,
-        createdAt: new Date()
-      });
-      return result;
+      return await firstValueFrom(this.userService.addUser(result.user.uid, username, email));
     } catch (error) {
       throw error;
     }

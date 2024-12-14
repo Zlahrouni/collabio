@@ -1,0 +1,35 @@
+<div *ngIf="project" class="project-container">
+  <header class="project-header">
+      <div class="project-title">
+          <h1>{{project.name}}</h1>
+          <div>
+            <a class="text-black hover:no-underline px-5 py-2 rounded-3xl hover:bg-gray-300 hover:text-black" [routerLink]="['/backlog', project.id]">Backlog</a>
+          </div>
+      </div>
+  </header>
+
+  <main class="project-content">
+
+    <section class="project-description">
+      <h2>Project description</h2>
+      <p>{{project.description}}</p>
+    </section>
+
+    <section class="project-budget">
+      <h2>Budget du Projet</h2>
+      <p><strong>Budget:</strong> {{project.budget}} €</p>
+    </section>
+
+    <section class="project-recent-Participants">
+      <h2>Participants</h2>
+      <div class="Participants-list">
+        <div class="Participants-item">
+          <div class="Participants-icon">👤</div>
+            <ul class="Participants-details">
+              <li *ngFor="let user of project.users">{{user}}</li>
+            </ul>
+          </div>
+        </div>
+    </section>
+  </main>
+</div>

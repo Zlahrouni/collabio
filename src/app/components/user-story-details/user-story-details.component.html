@@ -1,0 +1,12 @@
+<div *ngIf="userStory">
+  <div class="story-details mb-2">
+    <h3 class="text-md font-medium">{{userStory.type}}</h3>
+    <p class="text-gray-700">{{userStory.description}}</p>
+  </div>
+  <div class="story-metadata flex justify-between items-center text-sm text-gray-600">
+    <div class="story-assignee flex items-center">
+      <span class="mr-1">👤</span> {{userStory.assignedTo}}
+    </div>
+    <div class="story-points">{{userStory.storyPoints}}</div>
+  </div>
+</div>

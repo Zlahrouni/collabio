@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { SearchBarComponent } from './search-bar.component';
+import { BacklogComponent } from './backlog.component';
 
-describe('SearchBarComponent', () => {
-  let component: SearchBarComponent;
-  let fixture: ComponentFixture<SearchBarComponent>;
+describe('BacklogComponent', () => {
+  let component: BacklogComponent;
+  let fixture: ComponentFixture<BacklogComponent>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [SearchBarComponent]
+      imports: [BacklogComponent]
     });
-    fixture = TestBed.createComponent(SearchBarComponent);
+    fixture = TestBed.createComponent(BacklogComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

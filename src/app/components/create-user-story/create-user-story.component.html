@@ -1,0 +1,106 @@
+<div class="create-user-story-container max-w-3xl mx-auto bg-white font-sans p-5 shadow-sm">
+  <div tabindex="-1" id="error-messages" *ngIf="errorMessages.length > 0" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+    <p class="font-medium">Please fix the following errors:</p>
+    <ul class="list-disc list-inside">
+      <li *ngFor="let errorMessage of errorMessages">{{ errorMessage }}</li>
+    </ul>
+  </div>
+
+  <form [formGroup]="userStoryForm" class="user-story-form">
+    <div class="form-section mb-5">
+      <div class="form-group mb-4">
+        <label class="block mb-1 text-gray-700 font-medium">User Story Title</label>
+        <input
+          type="text"
+          formControlName="title"
+          placeholder="Briefly describe the feature"
+          class="form-control w-full p-2 border border-gray-300 rounded text-sm"
+        >
+      </div>
+
+      <div class="form-group description-group mb-4">
+        <label class="block mb-1 text-gray-700 font-medium">Description</label>
+        <textarea
+          formControlName="description"
+          placeholder="Detail the user story, acceptance criteria, etc."
+          class="form-control description-input w-full p-2 border border-gray-300 rounded text-sm min-h-[150px] resize-y"
+        ></textarea>
+      </div>
+    </div>
+    <div class="form-group mb-4">
+      <label class="block mb-1 text-gray-700 font-medium">Type</label>
+      <select
+        formControlName="type"
+        class="form-control w-full p-2 border border-gray-300 rounded text-sm"
+      >
+        <option *ngFor="let type of types" [value]="type">{{type}}</option>
+      </select>
+    </div>
+
+    <div class="form-group mb-4">
+      <label class="block mb-1 text-gray-700 font-medium">Story Points</label>
+      <input
+        type="number"
+        formControlName="storyPoints"
+        placeholder="Estimate the effort required"
+        class="form-control w-full p-2 border border-gray-300 rounded text-sm"/>
+    </div>
+
+    <div *ngIf="selectedUsers.trim() == ''">
+      <label class="block mb-2">Add Users</label>
+      <div class="flex">
+        <input
+          type="text"
+          class="block w-full max-w-md py-2 px-3 text-gray-900 rounded border border-gray-100 focus:outline-none focus:border-blue-500 dark:bg-gray-800 dark:text-white dark:border-gray-700"
+          placeholder="Search..."
+          (focus)="onFocus()"
+          (blur)="onBlur()"
+          (input)="searchUsers($event)"
+        />
+        <button
+          type="button"
+          class="bg-blue-500 text-white px-4 rounded-r"
+        >
+          Search
+        </button>
+      </div>
+
+      <div
+        *ngIf="isFocused && filteredUsers.length > 0"
+        class="mt-2 border rounded shadow-lg"
+      >
+        <div
+          *ngFor="let user of filteredUsers"
+          class="flex items-center justify-between p-2 border-b hover:bg-gray-100 cursor-pointer"
+          (mousedown)="addUser(user)"
+        >
+          <div>
+            <div class="font-medium">{{ user | truncate : 15 }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="selectedUsers.trim() !== ''">
+      <div class="flex items-center justify-between">
+        <label class="block mb-2">{{selectedUsers}}</label>
+        <button
+          type="button"
+          class="bg-red-500 text-white px-4 rounded"
+          (click)="removeUser(selectedUsers)"
+        >
+          clear
+        </button>
+      </div>
+    </div>
+
+    <div class="header-actions flex justify-end py-3">
+      <button
+        class="btn btn-primary bg-blue-600 text-white ml-2 p-2 rounded"
+        (click)="onSubmit()"
+      >
+        Create User Story
+      </button>
+    </div>
+  </form>
+</div>

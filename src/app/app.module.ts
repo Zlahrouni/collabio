@@ -12,10 +12,16 @@ import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { getFirestore, provideFirestore } from '@angular/fire/firestore';
 import { getAuth, provideAuth } from '@angular/fire/auth';
 import { getStorage, provideStorage } from '@angular/fire/storage';
+import { ProjectComponent } from './components/project/project.component';
+import { BacklogComponent } from './components/backlog/backlog.component';
+import { CreateUserStoryComponent } from './components/create-user-story/create-user-story.component';
+import { ReactiveFormsModule } from '@angular/forms';
+import { provideRouter } from '@angular/router';
+import { routes } from './app-routing.module';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
   ],
   imports: [
     BrowserModule,
@@ -24,12 +30,15 @@ import { getStorage, provideStorage } from '@angular/fire/storage';
     AppRoutingModule,
     NavbarComponent,
     FooterComponent,
+    ProjectComponent,
+    BacklogComponent,
+    ReactiveFormsModule,
     provideFirebaseApp(() => initializeApp(environment.firebase)),
     provideFirestore(() => getFirestore()),
     provideAuth(() => getAuth()),
     provideStorage(() => getStorage()),
   ],
-  providers: [],
+  providers: [provideRouter(routes)],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
