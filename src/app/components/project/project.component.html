@@ -1,15 +1,88 @@
 <div *ngIf="project" class="project-container">
   <header class="project-header">
-      <div class="project-title">
-          <h1>{{project.name}}</h1>
-          <div>
-            <a class="text-black hover:no-underline px-5 py-2 rounded-3xl hover:bg-gray-300 hover:text-black" [routerLink]="['/backlog', project.id]">Backlog</a>
-          </div>
+    <div class="project-title">
+      <div class="flex justify-between items-center">
+        <h1>{{project.name}}</h1>
+        <button
+          (click)="toggleEdit()"
+          class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+        >
+          {{ isEditing ? 'Cancel' : 'Edit Project' }}
+        </button>
       </div>
+      <div>
+        <a class="text-black hover:no-underline px-5 py-2 rounded-3xl hover:bg-gray-300 hover:text-black" [routerLink]="['/backlog', project.id]"> Backlog </a>
+      </div>
+    </div>
   </header>
 
-  <main class="project-content">
+  <form *ngIf="isEditing" [formGroup]="editForm" (ngSubmit)="onSubmit()" class="space-y-4 mt-4">
+    <div>
+      <label class="block mb-2">Project Name *</label>
+      <input formControlName="name" class="w-full p-2 border rounded">
+    </div>
 
+    <div>
+      <label class="block mb-2">Description</label>
+      <textarea formControlName="description" class="w-full p-2 border rounded h-32"></textarea>
+    </div>
+
+    <div>
+      <label class="block mb-2">Budget ($)</label>
+      <input type="number" formControlName="budget" class="w-full p-2 border rounded"/>
+    </div>
+
+    <div class="mt-4">
+      <label class="block mb-2">Project Users</label>
+      
+      <!-- users actuels -->
+      <div class="flex flex-wrap gap-2 mb-4">
+        <div *ngFor="let user of project.users" 
+             class="bg-blue-100 px-3 py-1 rounded-full flex items-center">
+          <span>{{ user }}</span>
+          <button type="button"
+                  *ngIf="user !== project.createdBy"
+                  (click)="removeUser(user)"
+                  class="ml-2 text-red-500 hover:text-red-700">
+            ×
+          </button>
+        </div>
+      </div>
+
+      <!-- recherche des users -->
+      <div class="relative">
+        <input
+          type="text"
+          [placeholder]="'Search users to add...'"
+          (input)="searchUsers($event)"
+          (focus)="onUserSearchFocus()"
+          (blur)="onUserSearchBlur()"
+          class="w-full p-2 border rounded"
+        />
+
+        <!-- affichage des users trouvés -->  
+        <div *ngIf="showUserResults && filteredUsers.length > 0"
+             class="absolute z-10 w-full mt-1 bg-white border rounded shadow-lg">
+          <div *ngFor="let user of filteredUsers"
+               (mousedown)="addUser(user)"
+               class="p-2 hover:bg-gray-100 cursor-pointer">
+            {{ user }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex gap-2">
+      <button type="submit" [disabled]="editForm.invalid" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 disabled:opacity-50">
+        Save Changes
+      </button>
+      <button type="button" (click)="toggleEdit()" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
+        Cancel
+      </button>
+    </div>
+  </form>
+
+  <main *ngIf="!isEditing" class="project-content">
     <section class="project-description">
       <h2>Project description</h2>
       <p>{{project.description}}</p>
@@ -25,11 +98,19 @@
       <div class="Participants-list">
         <div class="Participants-item">
           <div class="Participants-icon">👤</div>
-            <ul class="Participants-details">
-              <li *ngFor="let user of project.users">{{user}}</li>
-            </ul>
-          </div>
+          <ul class="Participants-details">
+            <li *ngFor="let user of project.users">{{user}}</li>
+          </ul>
         </div>
+      </div>
     </section>
   </main>
 </div>
+
+<style>
+  .project-container {
+    padding: 2rem;
+  }
+</style>
+
+

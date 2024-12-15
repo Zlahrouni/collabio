@@ -72,9 +72,7 @@ export class CreateUserStoryComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log('Project ID:', this.projectId)
     this.projectService.getUsernamesOfProject(this.projectId).subscribe(users => {
-      console.log('Users:', users)
       this.filteredUsers = users;
     });
   }
@@ -104,7 +102,6 @@ export class CreateUserStoryComponent implements OnInit {
   }
 
   onSubmit(): void {
-    console.log('Form submitted')
     this.errorMessages = [];
     if (this.userStoryForm.valid) {
       const title = this.userStoryForm.get('title')?.value;
@@ -112,10 +109,10 @@ export class CreateUserStoryComponent implements OnInit {
       const type = this.userStoryForm.get('type')?.value;
       const storyPoints = this.userStoryForm.get('storyPoints')?.value;
       const assignedTo = this.selectedUsers;
-      console.log('Creating user story:', title, description, type, storyPoints, assignedTo)
+
       this.userStoryService.createUserStory(this.projectId, title, description, type, storyPoints, assignedTo).subscribe({
         next: (userStory) => {
-          console.log('User story added:', userStory);
+
           this.userStoryCreated.emit()
           this.userStoryForm.reset();
           this.selectedUsers = '';

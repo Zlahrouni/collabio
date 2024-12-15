@@ -14,9 +14,24 @@ import {TruncatePipe} from "../../pipes/truncate.pipe";
 export class ProjectPreviewComponent {
   @Input() project!: Project;
   @Output() deleteProject = new EventEmitter<string>();
+  
+  showConfirmDelete = false;
 
-  onDeleteProject(event: MouseEvent): void {
+  onDeleteClick(event: MouseEvent): void {
     event.stopPropagation();
-    this.deleteProject.emit(this.project.id);
+    this.showConfirmDelete = true;
+  }
+
+  confirmDelete(event: MouseEvent): void {
+    event.stopPropagation();
+    if (this.project.id) {
+      this.deleteProject.emit(this.project.id);
+    }
+    this.showConfirmDelete = false;
+  }
+
+  cancelDelete(event: MouseEvent): void {
+    event.stopPropagation();
+    this.showConfirmDelete = false;
   }
 }

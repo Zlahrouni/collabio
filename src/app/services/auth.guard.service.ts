@@ -40,7 +40,6 @@ export const ProjectExistsGuard: CanActivateFn = (route, state) => {
   const projectService = inject(ProjectService);
   const router = inject(Router);
   const projectId = route.paramMap.get('id');
-  console.log('Project ID:', projectId)
   if (!projectId) {
     console.log('No project ID provided')
     return router.createUrlTree(['/']);

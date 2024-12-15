@@ -36,7 +36,6 @@ export class UserService {
       switchMap(() => docData(userDocRef).pipe(
         map(userData => ({id: docId, ...userData} as User)),
         tap(user => {
-          console.log('User added and saved:', user);
           this.saveUserToLocalStorage(user);
         })
 
@@ -62,7 +61,6 @@ export class UserService {
   }
 
   saveUserToLocalStorage(user: User) {
-    console.log('Saving user to localStorage:', user)
     localStorage.setItem('user', JSON.stringify(user));
     this.localUser$ = user;
   }
@@ -76,7 +74,6 @@ export class UserService {
   getLocalUser(): User | undefined {
     if (!this.localUser$) {
       const user = localStorage.getItem('user');
-      console.log('Retrieved user from localStorage:', user);
 
       if (user) {
         try {

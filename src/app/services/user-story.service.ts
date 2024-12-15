@@ -7,7 +7,10 @@ import {
   docData,
   DocumentReference,
   collectionData,
-  query, where, doc, setDoc
+  query, where, doc, setDoc,
+  deleteDoc,
+  updateDoc,
+  getDocs
 } from '@angular/fire/firestore';
 import { UserStory } from '../models/userStory';
 import {catchError, from, map, Observable, switchMap} from 'rxjs';
@@ -49,7 +52,29 @@ export class UserStoryService {
     );
   }
   getUserStories(projectId: string): Observable<UserStory[]> {
-    const userStoriesQuery = query(this.userStoriesCollection, where('projectId', '==', projectId));
-    return collectionData(userStoriesQuery, { idField: 'projectId' }) as Observable<UserStory[]>;
+    const userStoriesCollection = collection(this.firestore, 'userStories');
+    const q = query(userStoriesCollection, where("projectId", "==", projectId));
+
+    return from(getDocs(q)).pipe(
+      map(querySnapshot => {
+        return querySnapshot.docs.map(doc => ({
+          id: doc.id,  // S'assurer que ceci est présent
+          ...doc.data()
+        } as UserStory));
+      })
+    );
   }
+
+
+  updateUserStory(userStoryId: string, updates: Partial<UserStory>): Observable<void> {
+    const userStoryRef = doc(this.firestore, 'userStories', userStoryId);
+    return from(updateDoc(userStoryRef, updates));
+  }
+
+  deleteUserStory(userStoryId: string): Observable<void> {
+    const userStoryRef = doc(this.firestore, 'userStories', userStoryId);
+    return from(deleteDoc(userStoryRef));
+  }
+
+
 }

@@ -1,15 +1,37 @@
-<div
-  *ngIf="project"
-  class="bg-white p-4 rounded shadow relative transform transition-transform duration-300 hover:scale-105"
-  [routerLink]="['/project', project.id]"
+
+
+<div *ngIf="project"
+class="bg-white p-4 rounded shadow relative transform transition-transform duration-300 hover:scale-105"
+[routerLink]="['/project', project.id]"
 >
+<div class="absolute top-2 right-2">
+  <!-- Boutons de confirmation de suppression -->
+  <div *ngIf="showConfirmDelete" class="flex gap-2">
+    <button
+      (click)="confirmDelete($event)"
+      class="bg-red-500 text-white px-2 py-1 rounded text-sm hover:bg-red-600">
+      Confirm
+    </button>
+    <button
+      (click)="cancelDelete($event)"
+      class="bg-gray-500 text-white px-2 py-1 rounded text-sm hover:bg-gray-600">
+      Cancel
+    </button>
+  </div>
+  
+
   <button
-    (click)="onDeleteProject($event)"
-    class="absolute top-2 right-2 text-red-500 hover:text-red-700"
+    *ngIf="!showConfirmDelete"
+    (click)="onDeleteClick($event)"
+    class="text-red-500 hover:text-red-700"
   >
     ×
   </button>
-  <h2 class="text-lg font-bold">{{ project.name | truncate: 20 }}</h2>
-  <p class="text-gray-500">{{ project.description.trim() === '' ? '(No description)' : project.description | truncate: 40}}</p>
-  <p class="text-gray-500">Budget: {{ project.budget }}$</p>
+</div>
+
+<h2 class="text-lg font-bold">{{ project.name | truncate: 20 }}</h2>
+<p class="text-gray-500">
+  {{ project.description.trim() === '' ? '(No description)' : project.description | truncate: 40}}
+</p>
+<p class="text-gray-500">Budget: {{ project.budget }}$</p>
 </div>
