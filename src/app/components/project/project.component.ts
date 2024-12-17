@@ -5,7 +5,7 @@ import { ProjectService } from 'src/app/services/project.service';
 import { Project } from 'src/app/models/project';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { UserService } from 'src/app/services/user.service';
-
+import { BudgetValidators } from 'src/app/components/shared/validators/budget.validators';
 @Component({
   selector: 'clb-project',
   standalone: true,
@@ -32,7 +32,7 @@ export class ProjectComponent implements OnInit {
     this.editForm = this.fb.group({
       name: ['', Validators.required],
       description: [''],
-      budget: [0, [Validators.required, Validators.min(0)]],
+      budget: [0, Validators.required],
       users: [[]]
     });
    }
@@ -85,7 +85,15 @@ export class ProjectComponent implements OnInit {
         budget: this.project.budget,
         users: this.project.users
       });
-    }
+      const budgetControl = this.editForm.get('budget');
+      if (budgetControl) {
+        budgetControl.setValidators([
+          Validators.required,
+          BudgetValidators.minCurrentBudget(this.project.budget)
+        ]);
+        budgetControl.updateValueAndValidity();
+      }
+    } 
   }
 
   onSubmit() {
@@ -125,7 +133,7 @@ export class ProjectComponent implements OnInit {
     const query = (event.target as HTMLInputElement).value.toLowerCase();
     this.filteredUsers = this.allUsers
       .filter(user => 
-        user.toLowerCase().includes(query) && 
+        user.toLowerCase().includes(query) &&
         !this.project?.users.includes(user)
       )
       .slice(0, 4);
@@ -159,6 +167,10 @@ export class ProjectComponent implements OnInit {
       const updatedUsers = this.project.users.filter(user => user !== username);
       this.updateProjectUsers(updatedUsers);
     }
+  }
+
+  get budgetControl() {
+    return this.editForm.get('budget');
   }
 
   private updateProjectUsers(users: string[]) {

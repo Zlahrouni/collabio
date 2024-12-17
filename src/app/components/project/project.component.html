@@ -1,15 +1,19 @@
 <div *ngIf="project" class="project-container">
   <header class="project-header">
     <div class="project-title">
-      <div class="flex justify-between items-center">
-        <h1>{{project.name}}</h1>
-        <button
-          (click)="toggleEdit()"
-          class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-        >
-          {{ isEditing ? 'Cancel' : 'Edit Project' }}
-        </button>
+      <div>
+      <h1>{{project.name}}</h1>
+      <button
+        (click)="toggleEdit()"
+        class="inline-flex items-center px-4 py-2 ml-4 mt-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+        <div class="w-4 h-4 mr-2">
+          <img *ngIf="!isEditing" src="app/assets/icons/update.png" width="15" alt="">
+          <img *ngIf="isEditing" src="app/assets/icons/cancel.png" width="15" alt="">
+        </div>
+        {{ isEditing ? 'Cancel' : 'Edit Project' }}
+      </button>
       </div>
+
       <div>
         <a class="text-black hover:no-underline px-5 py-2 rounded-3xl hover:bg-gray-300 hover:text-black" [routerLink]="['/backlog', project.id]"> Backlog </a>
       </div>
@@ -30,6 +34,10 @@
     <div>
       <label class="block mb-2">Budget ($)</label>
       <input type="number" formControlName="budget" class="w-full p-2 border rounded"/>
+      <div *ngIf="budgetControl?.errors?.['minCurrentBudget'] && budgetControl?.touched" 
+           class="text-red-500 text-sm mt-1">
+        Le budget ne peut pas être inférieur au budget actuel ({{project.budget}} $)
+      </div>
     </div>
 
     <div class="mt-4">
