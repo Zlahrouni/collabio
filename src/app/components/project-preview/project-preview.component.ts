@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import {RouterLink} from "@angular/router";
 import {Project} from "../../models/project";
 import {TruncatePipe} from "../../pipes/truncate.pipe";
+import { ModalComponent } from '../shared/modal/modal.component';
 
 @Component({
   selector: 'clb-project-preview',
   standalone: true,
-  imports: [CommonModule, RouterLink, TruncatePipe],
+  imports: [CommonModule, ModalComponent, RouterLink, TruncatePipe],
   templateUrl: './project-preview.component.html',
   styleUrls: ['./project-preview.component.scss']
 })
@@ -17,21 +18,19 @@ export class ProjectPreviewComponent {
   
   showConfirmDelete = false;
 
-  onDeleteClick(event: MouseEvent): void {
+  onDeleteClick(event: Event): void {
     event.stopPropagation();
     this.showConfirmDelete = true;
   }
 
-  confirmDelete(event: MouseEvent): void {
-    event.stopPropagation();
+  confirmDelete(): void {
     if (this.project.id) {
       this.deleteProject.emit(this.project.id);
     }
     this.showConfirmDelete = false;
   }
 
-  cancelDelete(event: MouseEvent): void {
-    event.stopPropagation();
+  cancelDelete(): void {
     this.showConfirmDelete = false;
   }
 }

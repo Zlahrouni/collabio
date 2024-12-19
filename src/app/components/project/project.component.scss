@@ -102,6 +102,17 @@ $border-color: #DFE1E6;
         }
 
         .Participants-details {
+
+          display: flex;
+          flex-wrap: wrap;
+          gap: 10px;
+          width: 100%;
+
+          li {
+
+            flex: 0 0 auto;
+          }
+
           p {
             margin: 0;
             color: $secondary-color;

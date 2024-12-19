@@ -18,6 +18,7 @@ export class BacklogComponent implements OnInit {
   projectId: string = '';
   userStories: UserStory[] = [];
   userStoryModalOpen = false;
+  deleteUserStoryModalOpen = false;
   selectedUserStory: UserStory | null = null;
 
   createUsModalOpen = false;
@@ -43,8 +44,7 @@ export class BacklogComponent implements OnInit {
     });
   }
 
-  deleteUserStory(userStory: UserStory, event: Event) {
-    event.stopPropagation(); // Empêche l'ouverture du modal de détails
+  deleteUserStory(userStory: UserStory) { 
 
     this.userStorieService.deleteUserStory(userStory.id!).subscribe({
       next: () => {
@@ -55,6 +55,8 @@ export class BacklogComponent implements OnInit {
         alert('Error deleting user story');
       }
     });
+
+    this.closeDeleteUserStoryModal();
 
   }
 
@@ -89,6 +91,18 @@ export class BacklogComponent implements OnInit {
 
   closeUserStoryModal(): void {
     this.userStoryModalOpen = false;
+    this.selectedUserStory = null;
+  }
+
+  
+  openDeleteUserStoryModal(userStory: UserStory, event: Event): void {
+    event.stopPropagation();
+    this.selectedUserStory = userStory;
+    this.deleteUserStoryModalOpen = true;
+  }
+
+  closeDeleteUserStoryModal(): void {
+    this.deleteUserStoryModalOpen = false;
     this.selectedUserStory = null;
   }
 
