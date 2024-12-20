@@ -25,6 +25,7 @@ export class UserStoryDetailsComponent {
   filteredUsers: string[] = [];
   showUserResults = false;
   userModified = false;
+  errorMessages: string[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -34,6 +35,7 @@ export class UserStoryDetailsComponent {
     this.editForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(3)]],
       description: ['', [Validators.required, Validators.minLength(10)]],
+      status: ['', Validators.required],
       type: ['', Validators.required],
       storyPoints: [0, [Validators.required, Validators.min(1), Validators.max(13)]]
     });
@@ -56,6 +58,7 @@ export class UserStoryDetailsComponent {
       this.editForm.patchValue({
         title: this.userStory.title,
         description: this.userStory.description,
+        status: this.userStory.status,
         type: this.userStory.type,
         storyPoints: this.userStory.storyPoints
       });
@@ -113,7 +116,7 @@ export class UserStoryDetailsComponent {
   }
 
   onSubmit() {
-
+    this.errorMessages = [];
     if ((this.editForm.valid || this.userModified) && this.userStory?.id) {
       const updates = {
         ...this.editForm.value,
@@ -132,6 +135,57 @@ export class UserStoryDetailsComponent {
             alert('Error updating user story');
           }
         });
+    }else{
+      Object.keys(this.editForm.controls).forEach(key => {
+        const controlErrors = this.editForm.get(key)?.errors;
+        if (controlErrors) {
+          Object.keys(controlErrors).forEach(errorKey => {
+            this.errorMessages.push(this.getErrorMessage(key, errorKey));
+          });
+        }
+      });
+
+      // Focus with a timeout to ensure the element is rendered
+      if (this.errorMessages.length > 0) {
+        setTimeout(() => {
+          const errorMessagesElement = document.getElementById('error-messages');
+          if (errorMessagesElement) {
+            errorMessagesElement.focus();
+          }
+        }, 0);
+      }
+
     }
   }
+
+
+  getErrorMessage(controlName: string, errorKey: string): string {
+    const errorMessages: { [key: string]: { [key: string]: string } } = {
+      title: {
+        required: 'Title is required',
+        minlength: 'Title must be at least 3 characters long',
+        maxlength: 'Title cannot be more than 100 characters long',
+        uniqueTitle: 'Title must be unique within the project'
+      },
+      description: {
+        required: 'Description is required',
+        minlength: 'Description must be at least 10 characters long',
+        maxlength: 'Description cannot be more than 500 characters long'
+      },
+      type: {
+        required: 'Type is required'
+      },
+      status: {
+        required: 'Status is required'
+      },
+      storyPoints: {
+        required: 'Story points are required',
+        min: 'Story points must be at least 1',
+        max: 'Story points cannot be more than 13'
+      }
+    };
+    return errorMessages[controlName][errorKey];
+  }
+
+  
 }

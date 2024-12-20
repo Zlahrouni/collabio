@@ -29,7 +29,9 @@
     <div class="backlog-filters">
       <div class="search-container">
         <input type="text" placeholder="Rechercher des stories..." class="search-input">
-        <i class="search-icon">🔍</i>
+        <i class="search-icon">
+          <img src="app/assets/icons/search.png" width="15  " alt="">
+        </i>
       </div>
     </div>
   </div>
@@ -58,9 +60,18 @@
               [ngClass]="{
                 'bg-blue-100 text-blue-800': userStory?.type === 'Functionality',
                 'bg-green-100 text-green-800': userStory?.type === 'Update',
-                'bg-red-100 text-red-800': userStory?.type === 'Bug fix'
+                'bg-yellow-100 text-yellow-800': userStory?.type === 'Bug fix'
               }">
               {{ userStory?.type }}
+            </span>
+
+            <span class="px-3 py-1 mr-4 rounded-full text-sm font-medium" 
+            [ngClass]="{
+              'bg-blue-100 text-blue-800': userStory?.status === 'Completed',
+              'bg-green-100 text-green-800': userStory?.status === 'In progress',
+              'bg-red-100 text-red-800': userStory?.status === 'Not started'
+            }">
+              {{ userStory?.status }}
             </span>
 
             <button (click)="openDeleteUserStoryModal(userStory, $event)" class="text-red-500 hover:text-red-700">
