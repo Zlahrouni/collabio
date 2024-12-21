@@ -88,20 +88,20 @@
           </button>
         </div>
 
-      <div
-        *ngIf="isFocused && filteredUsers.length > 0"
-        class="mt-2 border rounded shadow-lg">
         <div
-          *ngFor="let user of filteredUsers"
-          class="flex items-center justify-between p-2 border-b hover:bg-gray-100 cursor-pointer"
-          (mousedown)="addUser(user)"
-        >
-          <div>
-            <div class="font-medium">{{ user | truncate : 15 }}</div>
+          *ngIf="isFocused && filteredUsers.length > 0"
+          class="mt-2 border rounded shadow-lg">
+          <div
+            *ngFor="let user of filteredUsers"
+            class="flex items-center justify-between p-2 border-b hover:bg-gray-100 cursor-pointer"
+            (mousedown)="addUser(user)"
+          >
+            <div>
+              <div class="font-medium">{{ user | truncate : 15 }}</div>
+            </div>
           </div>
         </div>
       </div>
-
       <!-- Selected User -->
       <div *ngIf="selectedUsers.trim() !== ''"
            class="flex items-center justify-between p-3 border border-gray-300 rounded-md bg-gray-50">
@@ -125,6 +125,6 @@
         Create User Story
       </button>
     </div>
-    </div>
+
   </form>
 </div>

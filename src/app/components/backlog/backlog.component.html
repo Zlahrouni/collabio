@@ -26,19 +26,41 @@
       </clb-create-user-story>
     </clb-modal>
 
-    <div class="backlog-filters">
-      <div class="search-container">
-        <input type="text" placeholder="Rechercher des stories..." class="search-input">
-        <i class="search-icon">
-          <img src="app/assets/icons/search.png" width="15  " alt="">
-        </i>
+    <div class="backlog-filters mb-4">
+      <div class="search-container relative">
+        <input
+          #searchInput
+          type="text"
+          [(ngModel)]="searchTerm"
+          (input)="onSearch($event)"
+          placeholder="Search user stories..."
+          class="w-full px-4 py-2 pl-10 pr-10 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-text"
+        >
+        <!-- Search Icon -->
+        <button
+          (click)="searchInput.focus()"
+          class="absolute left-3 top-1/2 transform -translate-y-1/2 hover:opacity-75 transition-opacity"
+        >
+          <img src="app/assets/icons/search.png" width="15" alt="Search" class="opacity-60">
+        </button>
+
+        <!-- Clear Button -->
+        <button
+          *ngIf="searchTerm"
+          (click)="clearSearch()"
+          class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
       </div>
     </div>
   </div>
 
-  <div *ngIf="userStories.length > 0">
+  <div *ngIf="filteredUserStories.length > 0">
     <section class="backlog-stories space-y-4">
-      <div *ngFor="let userStory of userStories" class="backlog-story-list">
+      <div *ngFor="let userStory of filteredUserStories" class="backlog-story-list">
         <div class="story-item p-4 bg-white rounded shadow-md flex justify-between items-center"  (click)="openUserStoryModal(userStory)">
           <div class="flex items-center">
             <div class="flex items-center mr-2">
@@ -85,8 +107,10 @@
     </section>
   </div>
 
-  <div *ngIf="userStories.length === 0">
-    <p class="text-gray-500">Create your first user story.</p>
+  <div *ngIf="filteredUserStories.length === 0" class="text-center py-8">
+    <p class="text-gray-500">
+      {{ userStories.length === 0 ? 'Create your first user story.' : 'No user stories match your search.' }}
+    </p>
   </div>
 
 
