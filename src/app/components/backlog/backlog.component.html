@@ -28,6 +28,7 @@
       <div *ngFor="let userStory of userStories" class="backlog-story-list">
         <div class="story-item p-4 bg-white rounded shadow-md flex justify-between items-center"  (click)="openUserStoryModal(userStory)">
           <div class="flex items-center">
+            <span [clbPriorityIcon]="userStory.priority"></span>
             <div class="story-points bg-gray-200 rounded-full px-2 py-1 mr-2">{{userStory.storyPoints}}</div>
             <span class="story-key font-semibold text-lg cursor-pointer" (click)="openUserStoryModal(userStory)">{{userStory.title}}</span>
           </div>

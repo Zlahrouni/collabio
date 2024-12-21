@@ -31,7 +31,7 @@ import {catchError, map, Observable, of} from "rxjs";
   styleUrls: ['./create-user-story.component.scss']
 })
 export class CreateUserStoryComponent implements OnInit {
-  userStoryForm: FormGroup;
+  userStoryForm?: FormGroup;
   filteredUsers: string[] = [];
   selectedUsers: string = '';
   isFocused = false;
@@ -45,37 +45,55 @@ export class CreateUserStoryComponent implements OnInit {
     'Bug fix',
   ];
 
+  priorities = [
+    'High',
+    'Medium',
+    'Low'
+  ];
 
   constructor(
     private fb: FormBuilder,
     private readonly projectService: ProjectService,
     private readonly userStoryService: UserStoryService
     ) {
+
+  }
+
+  ngOnInit(): void {
+    this.initForm();
+    this.projectService.getUsernamesOfProject(this.projectId).subscribe(users => {
+      console.log('Users:', users)
+      this.filteredUsers = users;
+    });
+  }
+
+  initForm(): void {
+    const defaultValues = {
+      title: '',
+      description: '',
+      type: 'Functionality',
+      priority: 'Medium',
+      storyPoints: 3
+    };
+
     this.userStoryForm = this.fb.group({
-      title: ['', [
+      title: [defaultValues.title, [
         Validators.required,
         Validators.minLength(3),
         Validators.maxLength(100)
-      ],],
-      description: ['', [
+      ]],
+      description: [defaultValues.description, [
         Validators.required,
         Validators.minLength(10),
         Validators.maxLength(500)
       ]],
-      type: ['Functionality', Validators.required],
-      storyPoints: [3, [
+      type: [defaultValues.type, Validators.required],
+      priority: [defaultValues.priority, Validators.required],
+      storyPoints: [defaultValues.storyPoints, [
         Validators.required,
         Validators.min(1),
         Validators.max(13)
       ]],
-    });
-  }
-
-  ngOnInit(): void {
-    console.log('Project ID:', this.projectId)
-    this.projectService.getUsernamesOfProject(this.projectId).subscribe(users => {
-      console.log('Users:', users)
-      this.filteredUsers = users;
     });
   }
 
@@ -106,18 +124,19 @@ export class CreateUserStoryComponent implements OnInit {
   onSubmit(): void {
     console.log('Form submitted')
     this.errorMessages = [];
-    if (this.userStoryForm.valid) {
+    if (this.userStoryForm?.valid) {
       const title = this.userStoryForm.get('title')?.value;
       const description = this.userStoryForm.get('description')?.value;
+      const priority = this.userStoryForm.get('priority')?.value;
       const type = this.userStoryForm.get('type')?.value;
       const storyPoints = this.userStoryForm.get('storyPoints')?.value;
       const assignedTo = this.selectedUsers;
       console.log('Creating user story:', title, description, type, storyPoints, assignedTo)
-      this.userStoryService.createUserStory(this.projectId, title, description, type, storyPoints, assignedTo).subscribe({
+      this.userStoryService.createUserStory(this.projectId, title, description, type, priority, storyPoints, assignedTo).subscribe({
         next: (userStory) => {
           console.log('User story added:', userStory);
           this.userStoryCreated.emit()
-          this.userStoryForm.reset();
+          this.userStoryForm?.reset();
           this.selectedUsers = '';
         },
         error: (error) => {
@@ -125,8 +144,8 @@ export class CreateUserStoryComponent implements OnInit {
         }
       });
     } else {
-      Object.keys(this.userStoryForm.controls).forEach(key => {
-        const controlErrors = this.userStoryForm.get(key)?.errors;
+      Object.keys(this.userStoryForm?.controls!).forEach(key => {
+        const controlErrors = this.userStoryForm?.get(key)?.errors;
         if (controlErrors) {
           Object.keys(controlErrors).forEach(errorKey => {
             this.errorMessages.push(this.getErrorMessage(key, errorKey));
@@ -159,6 +178,9 @@ export class CreateUserStoryComponent implements OnInit {
         minlength: 'Description must be at least 10 characters long',
         maxlength: 'Description cannot be more than 500 characters long'
       },
+      priority: {
+        required: 'Priority is required'
+      },
       type: {
         required: 'Type is required'
       },
@@ -174,21 +196,9 @@ export class CreateUserStoryComponent implements OnInit {
     return errorMessages[controlName][errorKey];
   }
 
-  uniqueTitleValidator(): AsyncValidatorFn {
-    return (control: AbstractControl): Observable<ValidationErrors | null> => {
-      return this.userStoryService.getUserStories(this.projectId).pipe(
-        map(userStories => {
-          const isUnique = !userStories.some(userStory => userStory.title === control.value);
-          return isUnique ? null : { uniqueTitle: { value: control.value } };
-        }),
-        catchError(() => of(null))
-      );
-    };
-  }
-
   resetForm(): void {
-    this.userStoryForm.reset();
     this.selectedUsers = '';
     this.errorMessages = [];
+    this.ngOnInit();
   }
 }
