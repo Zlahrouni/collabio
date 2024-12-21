@@ -6,11 +6,12 @@ import {ActivatedRoute} from "@angular/router";
 import {ModalComponent} from "../shared/modal/modal.component";
 import {CreateUserStoryComponent} from "../create-user-story/create-user-story.component";
 import {UserStoryDetailsComponent} from "../user-story-details/user-story-details.component";
+import {PriorityIconDirective} from "../../directives/priority-icon.directive";
 
 @Component({
   selector: 'clb-backlog',
   standalone: true,
-  imports: [CommonModule, ModalComponent, CreateUserStoryComponent, UserStoryDetailsComponent],
+  imports: [CommonModule, ModalComponent, CreateUserStoryComponent, UserStoryDetailsComponent, PriorityIconDirective],
   templateUrl: './backlog.component.html',
   styleUrls: ['./backlog.component.scss']
 })

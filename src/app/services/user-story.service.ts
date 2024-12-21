@@ -24,7 +24,7 @@ export class UserStoryService {
   constructor(private readonly firestore: Firestore) {
     this.userStoriesCollection = collection(this.firestore, 'userStories') as CollectionReference<UserStory>;
   }
-  createUserStory(projectId: string, title: string, description: string, type: string, storyPoints: number, assignedTo: string): Observable<UserStory> {
+  createUserStory(projectId: string, title: string, description: string, type: string, priority: string,  storyPoints: number, assignedTo: string): Observable<UserStory> {
     const userStoryId = uuidv4();
     const userStoryDocRef = doc(this.userStoriesCollection, userStoryId);
     const userStory: UserStory = {
@@ -32,6 +32,7 @@ export class UserStoryService {
       storyPoints,
       assignedTo,
       description,
+      priority,
       title,
       projectId,
       status: UserStoryService.NOTSTARTED,
