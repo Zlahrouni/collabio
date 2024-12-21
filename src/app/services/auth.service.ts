@@ -11,7 +11,7 @@ import {
 import {doc, Firestore, getDoc} from '@angular/fire/firestore';
 import {Dialog} from '@angular/cdk/dialog';
 import {UsernameDialogComponent} from '../components/shared/username-dialog/username-dialog.component';
-import {firstValueFrom} from 'rxjs';
+import {BehaviorSubject, firstValueFrom, map, Observable, take} from 'rxjs';
 import {UserService} from "./user.service";
 
 @Injectable({
@@ -19,13 +19,34 @@ import {UserService} from "./user.service";
 })
 export class AuthService {
   user$ = user(this.auth);
+  private currentUserData$ = new BehaviorSubject<any>(null);
 
   constructor(
     private auth: Auth,
     private firestore: Firestore,
     private dialog: Dialog,
     private readonly userService: UserService
-  ) {}
+  ) {
+    this.user$.subscribe(async (user) => {
+      if (user) {
+        const userData = await firstValueFrom(this.userService.getUserByIdDoc(user.uid));
+        this.currentUserData$.next(userData);
+      } else {
+        this.currentUserData$.next(null);
+      }
+    });
+  }
+
+  getCurrentUserData$(): Observable<any> {
+    return this.currentUserData$.asObservable();
+  }
+
+
+  isConnected(): Observable<boolean> {
+    return this.user$.pipe(
+      map(user => !!user)
+    );
+  }
 
   // Connexion avec Google
   async loginWithGoogle() {
@@ -34,27 +55,28 @@ export class AuthService {
       const result = await signInWithPopup(this.auth, provider);
       const userExist = await firstValueFrom(this.userService.getUserByIdDoc(result.user.uid));
 
-      console.log('User exist:', userExist);
-
+      let userData;
       if (!userExist) {
         const username = await this.showUsernameDialog();
         if (!username) {
           await this.logout();
           throw new Error('Username is required to complete registration');
         }
-        const newUser = await firstValueFrom(this.userService.addUser(result.user.uid, username, result.user.email!));
-        this.userService.saveUserToLocalStorage(newUser);
-
-        return newUser;
+        userData = await firstValueFrom(this.userService.addUser(result.user.uid, username, result.user.email!));
       } else {
-        this.userService.saveUserToLocalStorage(userExist);
-        return userExist;
+        userData = userExist;
       }
+
+      this.userService.saveUserToLocalStorage(userData);
+      this.currentUserData$.next(userData);  // Emit the new user data
+      return userData;
     } catch (error) {
       console.error('Google login error:', error);
       throw error;
     }
   }
+
+
 
   private async showUsernameDialog() {
     const dialogRef = this.dialog.open<string>(UsernameDialogComponent);
@@ -84,6 +106,8 @@ export class AuthService {
   async logout() {
     try {
       await signOut(this.auth);
+      this.currentUserData$.next(null);  // Clear the user data
+      this.userService.removeUserFromLocalStorage();
     } catch (error) {
       throw error;
     }

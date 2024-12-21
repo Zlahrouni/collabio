@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from "@angular/router";
 import { AuthService } from 'src/app/services/auth.service';
-import { Observable } from 'rxjs';
+import {Observable, Subscription} from 'rxjs';
 import { User } from '@angular/fire/auth';
 import {UserService} from "../../services/user.service";
 import {TruncatePipe} from "../../pipes/truncate.pipe";
@@ -15,16 +15,33 @@ import {TruncatePipe} from "../../pipes/truncate.pipe";
   styleUrls: ['./navbar.component.scss']
 })
 export class NavbarComponent implements OnInit, OnDestroy {
-  user$: Observable<User | null>;
+  isConnected: boolean = false;
   protected username?: string = 'Unknown user';
   private documentClickListener: any;
+  private authSubscription?: Subscription;
+  private userDataSubscription?: Subscription;
 
-  constructor(private authService: AuthService, private readonly userService: UserService, private router: Router) {
-    this.user$ = this.authService.user$;
-  }
+  constructor(
+    private authService: AuthService,
+    private readonly userService: UserService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
-    this.username = this.userService.getLocalUser()?.username;
+    // Subscribe to auth state
+    this.authSubscription = this.authService.user$.subscribe(user => {
+      this.isConnected = !!user;
+    });
+
+    // Subscribe to user data changes
+    this.userDataSubscription = this.authService.getCurrentUserData$().subscribe(userData => {
+      if (userData) {
+        this.username = userData.username;
+      } else {
+        this.username = 'Unknown user';
+      }
+    });
+
     this.documentClickListener = (event: MouseEvent) => {
       const userMenuButton = document.getElementById('user-menu');
       const profileDropdown = document.getElementById('profile-dropdown');
@@ -45,7 +62,15 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    document.removeEventListener('click', this.documentClickListener);
+    if (this.authSubscription) {
+      this.authSubscription.unsubscribe();
+    }
+    if (this.userDataSubscription) {
+      this.userDataSubscription.unsubscribe();
+    }
+    if (this.documentClickListener) {
+      document.removeEventListener('click', this.documentClickListener);
+    }
   }
 
   toggleMenu(menuId: string): void {
@@ -64,6 +89,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   async logout(): Promise<void> {
     try {
       await this.authService.logout();
+      this.userService.removeUserFromLocalStorage();
       await this.router.navigate(['/login']);
     } catch (error) {
       console.error('Erreur lors de la déconnexion:', error);
