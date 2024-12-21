@@ -1,5 +1,14 @@
 <div>
-  <button (click)="openModal()" class="bg-blue-300 rounded px-2">Create a new Project</button>
+
+  <button 
+    (click)="openModal()" 
+    class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+    <div class="w-4 h-4 mr-2">
+      <img src="app/assets/icons/add.png" width="15" alt="">
+    </div>
+    
+    Create a new Project
+  </button>
 
   <clb-modal
     [isOpen]="createProjectModalOpen"
@@ -78,8 +87,7 @@
               placeholder="Search..."
               (focus)="onFocus()"
               (blur)="onBlur()"
-              (input)="searchUsers($event)"
-            />
+              (input)="searchUsers($event)"/>
             <button
               type="button"
               class="bg-blue-500 text-white px-4 rounded-r"
@@ -87,7 +95,7 @@
               Search
             </button>
           </div>
-
+    
           <div
             *ngIf="isFocused && filteredUsers.length > 0"
             class="mt-2 border rounded shadow-lg"
@@ -98,7 +106,7 @@
               (mousedown)="addUser(user)"
             >
               <div>
-                <div class="font-medium">{{ user | truncate : 15}}</div>
+                <div class="font-medium">{{ user | truncate : 15 }}</div>
               </div>
             </div>
           </div>
@@ -119,8 +127,12 @@
     <h1 class="text-2xl font-bold mb-6">My projects</h1>
     <div class="grid grid-cols-3 gap-4">
       <div *ngFor="let project of projects">
-        <clb-project-preview [project]="project"/>
+        <clb-project-preview 
+        (deleteProject)="handleProjectDelete($event)"
+        [project]="project"/>
       </div>
     </div>
   </div>
+
+  
 </div>

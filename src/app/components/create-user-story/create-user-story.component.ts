@@ -122,7 +122,6 @@ export class CreateUserStoryComponent implements OnInit {
   }
 
   onSubmit(): void {
-    console.log('Form submitted')
     this.errorMessages = [];
     if (this.userStoryForm?.valid) {
       const title = this.userStoryForm.get('title')?.value;
@@ -131,10 +130,8 @@ export class CreateUserStoryComponent implements OnInit {
       const type = this.userStoryForm.get('type')?.value;
       const storyPoints = this.userStoryForm.get('storyPoints')?.value;
       const assignedTo = this.selectedUsers;
-      console.log('Creating user story:', title, description, type, storyPoints, assignedTo)
       this.userStoryService.createUserStory(this.projectId, title, description, type, priority, storyPoints, assignedTo).subscribe({
         next: (userStory) => {
-          console.log('User story added:', userStory);
           this.userStoryCreated.emit()
           this.userStoryForm?.reset();
           this.selectedUsers = '';

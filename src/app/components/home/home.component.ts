@@ -131,6 +131,8 @@ export class HomeComponent implements OnInit {
         createdAt: new Date()
       };
 
+        console.log('Project Created:', project);
+
       const users = this.projectForm.get('users')?.value || [];
 
       this.projectService.addProject(project, users).subscribe(
@@ -165,6 +167,28 @@ export class HomeComponent implements OnInit {
 
       console.log('Errors : ', this.errors);
     }
+  }
+  handleProjectDelete(projectId: string | undefined) {
+    if (!projectId) {
+      console.error('Project ID is undefined');
+      return;
+    }
+  
+    this.projectService.deleteProject(projectId).subscribe({
+      next: () => {
+        // Retirer le projet de la liste locale
+        this.projects = this.projects.filter(project => project.id !== projectId);
+        console.log('Project deleted successfully');
+      },
+      error: (error) => {
+        console.error('Error deleting project:', error);
+        if (error.message.includes('Unauthorized')) {
+          alert('You can only delete projects you created');
+        } else {
+          alert('An error occurred while deleting the project');
+        }
+      }
+    });
   }
 
   selectUser(user: string) {

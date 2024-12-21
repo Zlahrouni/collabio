@@ -19,6 +19,7 @@ export class BacklogComponent implements OnInit {
   projectId: string = '';
   userStories: UserStory[] = [];
   userStoryModalOpen = false;
+  deleteUserStoryModalOpen = false;
   selectedUserStory: UserStory | null = null;
 
   createUsModalOpen = false;
@@ -30,9 +31,7 @@ export class BacklogComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
-      console.log('Route Params:', params.get('id'))
       this.projectId = params.get('id')!;
-      console.log('Backlog for Project ID:', this.projectId);
     });
 
     // Fetch user stories for the project
@@ -42,9 +41,34 @@ export class BacklogComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error fetching user stories:', error);
+      }
+    });
+  }
+
+  deleteUserStory(userStory: UserStory) { 
+
+    this.userStorieService.deleteUserStory(userStory.id!).subscribe({
+      next: () => {
+        this.userStories = this.userStories.filter(us => us.id !== userStory.id);
       },
-      complete: () => {
-        console.log('User stories fetch observable completed');
+      error: (error) => {
+        console.error('Error deleting user story:', error);
+        alert('Error deleting user story');
+      }
+    });
+
+    this.closeDeleteUserStoryModal();
+
+  }
+
+  // Ajout d'une méthode pour rafraîchir la liste après une mise à jour
+  refreshUserStories() {
+    this.userStorieService.getUserStories(this.projectId).subscribe({
+      next: (userStories) => {
+        this.userStories = userStories;
+      },
+      error: (error) => {
+        console.error('Error fetching user stories:', error);
       }
     });
   }
@@ -71,7 +95,22 @@ export class BacklogComponent implements OnInit {
     this.selectedUserStory = null;
   }
 
-  deleteUserStory(userStory: UserStory) {
-
+  
+  openDeleteUserStoryModal(userStory: UserStory, event: Event): void {
+    event.stopPropagation();
+    this.selectedUserStory = userStory;
+    this.deleteUserStoryModalOpen = true;
   }
+
+  closeDeleteUserStoryModal(): void {
+    this.deleteUserStoryModalOpen = false;
+    this.selectedUserStory = null;
+  }
+
+
+  onUserStoryUpdated(): void {
+    this.refreshUserStories();
+    this.closeUserStoryModal();
+  }
+
 }

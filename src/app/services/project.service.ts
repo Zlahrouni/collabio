@@ -9,7 +9,9 @@ import {
   docData,
   DocumentReference,
   Firestore,
-  getDoc
+  getDoc,
+  deleteDoc,
+  updateDoc
 } from "@angular/fire/firestore";
 import {Project} from "../models/project";
 import {catchError, from, map, Observable, of, switchMap} from "rxjs";
@@ -55,9 +57,7 @@ export class ProjectService {
   getMyProjects(): Observable<Project[]> {
     return collectionData(this.projectCollection, { idField: 'id' }).pipe(
       map(projects => {
-        console.log('All projects:', projects);
         const user = this.userService.getLocalUser();
-        console.log('Current user:', user);
 
         if (!user) {
           console.error('No local user found');
@@ -75,12 +75,10 @@ export class ProjectService {
   }
 
   getProjectById(id: string): Observable<Project | null> {
-    console.log('Fetching project with ID:', id)
     const projectDocRef = doc(this.fireStore, 'projects', id);
 
     return from(getDoc(projectDocRef)).pipe(
       map(docSnapshot => {
-        console.log('Document snapshot exists:', docSnapshot.exists());
 
         if (docSnapshot.exists()) {
           const projectData = docSnapshot.data() as Project;
@@ -119,4 +117,64 @@ export class ProjectService {
       })
     );
   }
+
+  updateProject(projectId: string, updates: Partial<Project>): Observable<void> {
+    const projectRef = doc(this.projectCollection, projectId);
+
+    return from(getDoc(projectRef)).pipe(
+      switchMap(docSnapshot => {
+        if (!docSnapshot.exists()) {
+          throw new Error('Project not found');
+        }
+
+        const currentUser = this.userService.getLocalUser();
+        if (!currentUser?.username) {
+          throw new Error('User not authenticated');
+        }
+
+        const project = docSnapshot.data();
+        if (project.createdBy !== currentUser.username) {
+          throw new Error('Unauthorized: Only the project creator can update the project');
+        }
+
+        // Mise à jour du document
+        return from(updateDoc(projectRef, updates));
+      }),
+      catchError(error => {
+        console.error('Error updating project:', error);
+        throw error;
+      })
+    );
+  }
+
+
+  deleteProject(projectId: string): Observable<void> {
+    return this.getProjectById(projectId).pipe(
+      switchMap(project => {
+        if (!project) {
+          throw new Error('Project not found');
+        }
+
+        const currentUser = this.userService.getLocalUser();
+        if (!currentUser?.username) {
+          throw new Error('User not authenticated');
+        }
+
+        // Vérifier si l'utilisateur est le créateur du projet
+        if (project.createdBy !== currentUser.username) {
+          throw new Error('Unauthorized: Only the project creator can delete the project');
+        }
+
+        const projectDocRef = doc(this.projectCollection, projectId);
+        return from(deleteDoc(projectDocRef));
+      }),
+      catchError(error => {
+        console.error('Error deleting project:', error);
+        throw error;
+      })
+    );
+  }
+
+
+  
 }
