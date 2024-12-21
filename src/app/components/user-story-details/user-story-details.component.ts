@@ -4,10 +4,11 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { UserStory } from "../../models/userStory";
 import { UserStoryService } from '../../services/user-story.service';
 import { UserService } from '../../services/user.service';
+import {TruncatePipe} from "../../pipes/truncate.pipe";
 @Component({
   selector: 'clb-user-story-details',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, TruncatePipe],
   templateUrl: './user-story-details.component.html',
   styleUrls: ['./user-story-details.component.scss']
 })
@@ -187,5 +188,5 @@ export class UserStoryDetailsComponent {
     return errorMessages[controlName][errorKey];
   }
 
-  
+
 }

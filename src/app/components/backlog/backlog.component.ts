@@ -7,11 +7,12 @@ import {ModalComponent} from "../shared/modal/modal.component";
 import {CreateUserStoryComponent} from "../create-user-story/create-user-story.component";
 import {UserStoryDetailsComponent} from "../user-story-details/user-story-details.component";
 import {PriorityIconDirective} from "../../directives/priority-icon.directive";
+import {TruncatePipe} from "../../pipes/truncate.pipe";
 
 @Component({
   selector: 'clb-backlog',
   standalone: true,
-  imports: [CommonModule, ModalComponent, CreateUserStoryComponent, UserStoryDetailsComponent, PriorityIconDirective],
+  imports: [CommonModule, ModalComponent, CreateUserStoryComponent, UserStoryDetailsComponent, PriorityIconDirective, TruncatePipe],
   templateUrl: './backlog.component.html',
   styleUrls: ['./backlog.component.scss']
 })
@@ -45,7 +46,7 @@ export class BacklogComponent implements OnInit {
     });
   }
 
-  deleteUserStory(userStory: UserStory) { 
+  deleteUserStory(userStory: UserStory) {
 
     this.userStorieService.deleteUserStory(userStory.id!).subscribe({
       next: () => {
@@ -95,7 +96,7 @@ export class BacklogComponent implements OnInit {
     this.selectedUserStory = null;
   }
 
-  
+
   openDeleteUserStoryModal(userStory: UserStory, event: Event): void {
     event.stopPropagation();
     this.selectedUserStory = userStory;

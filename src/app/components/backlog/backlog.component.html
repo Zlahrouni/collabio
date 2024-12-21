@@ -48,7 +48,7 @@
               </svg>
               <span class="text-lg font-medium text-gray-600">{{ userStory?.storyPoints }} points</span>
             </div>
-            <span class="story-key font-semibold text-lg cursor-pointer">{{userStory.title}}</span>
+            <span class="story-key font-semibold text-lg cursor-pointer">{{userStory.title | truncate: 30}}</span>
           </div>
           <div class="flex items-center">
             <div class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800">
