@@ -11,7 +11,7 @@
         class="inline-flex items-center px-4 py-2 mr-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
         <div class="w-4 h-4 mr-2">
           <img src="app/assets/icons/update.png" width="15" alt="">
-        </div>  
+        </div>
         Edit
       </button>
         <a class="text-black hover:no-underline px-5 py-2 rounded-3xl hover:bg-gray-300 hover:text-black" [routerLink]="['/backlog', project.id]"> Backlog </a>
@@ -66,19 +66,18 @@
         </div>
       </div>
 
-      <!-- recherche des users -->
+
       <div class="relative">
         <input
           type="text"
           [placeholder]="'Search users to add...'"
           (input)="searchUsers($event)"
-          (focus)="onUserSearchFocus()"
-          (blur)="onUserSearchBlur()"
+          (focus)="onFocus()"
+          (blur)="onBlur()"
           class="w-full p-2 border rounded"
         />
 
-        <!-- affichage des users trouvés -->  
-        <div *ngIf="showUserResults && filteredUsers.length > 0"
+        <div *ngIf="isFocused && filteredUsers.length > 0"
              class="absolute z-10 w-full mt-1 bg-white border rounded shadow-lg">
           <div *ngFor="let user of filteredUsers"
                (mousedown)="addUser(user)"
@@ -87,6 +86,7 @@
           </div>
         </div>
       </div>
+
     </div>
 
     <div class="flex gap-2">

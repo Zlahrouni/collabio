@@ -6,7 +6,7 @@
 
   <div class="absolute top-2 right-2">
     <button
-      *ngIf="!showConfirmDelete"
+      *ngIf="!showConfirmDelete && CanDelete"
       (click)="onDeleteClick($event)"
       class="text-red-500 hover:text-red-700">
       <img src="app/assets/icons/cancel-indigo.png" alt="Delete" class="w-4 h-4 ml-2">
@@ -14,10 +14,10 @@
 </div>
 
   <h2 class="text-lg font-bold">{{ project.name | truncate: 20 }}</h2>
-  <p class="text-gray-500">
+  <p class="text-xs text-gray-500 whitespace-normal break-words overflow-wrap-anywhere">
     {{ project.description.trim() === '' ? '(No description)' : project.description | truncate: 40}}
   </p>
-  <p class="text-gray-500">Budget: {{ project.budget }}$</p>
+  <p class="text-xs text-gray-500">Budget: {{ project.budget }}$</p>
 </div>
 
 <clb-modal

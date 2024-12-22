@@ -37,7 +37,7 @@
 
     <!-- Assigné à -->
     <div>
-      <h2 class="text-lg font-semibold text-gray-900">Assigné à</h2>
+      <h2 class="text-lg font-semibold text-gray-900">Assigned To</h2>
       <div class="mt-2">
         <div class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800">
           <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -50,6 +50,8 @@
 
     <div class="pt-4 border-t">
       <button
+        type="button"
+        *ngIf="CanUpdate()"
         (click)="toggleEdit()"
         class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -87,21 +89,36 @@
       ></textarea>
     </div>
 
-    <div>
-      <label class="block mb-1 text-gray-700">Type</label>
-      <select formControlName="type" class="w-full p-2 border rounded">
-        <option value="Functionality">Functionality</option>
-        <option value="Update">Update</option>
-        <option value="Bug fix">Bug fix</option>
-      </select>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="form-group">
+        <label class="block mb-2 text-gray-700 font-medium">Type</label>
+        <select
+          formControlName="type"
+          class="form-control w-full p-3 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+        >
+          <option *ngFor="let type of types" [value]="type">{{type}}</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="block mb-2 text-gray-700 font-medium">Priority</label>
+        <select
+          formControlName="priority"
+          class="form-control w-full p-3 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+        >
+          <option *ngFor="let priority of priorities" [value]="priority">{{priority}}</option>
+        </select>
+      </div>
     </div>
 
-    <div>
-      <label class="block mb-1 text-gray-700">Status</label>
-      <select formControlName="status" class="w-full p-2 border rounded">
-        <option value="Completed">Completed</option>
-        <option value="In progress">In progress</option>
-        <option value="Not started">Not started</option>
+
+    <div class="form-group">
+      <label class="block mb-2 text-gray-700 font-medium">Status</label>
+      <select
+        formControlName="status"
+        class="form-control w-full p-3 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+      >
+        <option *ngFor="let status of allstatus" [value]="status">{{status}}</option>
       </select>
     </div>
 
@@ -115,7 +132,7 @@
     </div>
 
     <div>
-      <label class="block mb-1 text-gray-700">Assigned User</label>
+      <label class="block mb-1 text-gray-700">Assigned To</label>
 
       <div *ngIf="userStory?.assignedTo" class="mb-2">
         <div class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800">
@@ -134,17 +151,17 @@
 
       </div>
 
-      <div class="relative" *ngIf="!userStory?.assignedTo">
+      <div class="relative">
         <input
           type="text"
           [placeholder]="'Search users to assign...'"
-          (focus)="onUserSearchFocus()"
-          (blur)="onUserSearchBlur()"
+          (focus)="onFocus()"
+          (blur)="onBlur()"
           (input)="searchUsers($event)"
           class="w-full p-2 border rounded"
         />
 
-        <div *ngIf="showUserResults && filteredUsers.length > 0"
+        <div *ngIf="isFocused && filteredUsers.length > 0"
             class="absolute z-10 w-full mt-1 bg-white border rounded shadow-lg">
           <div *ngFor="let user of filteredUsers"
               (mousedown)="assignUser(user)"
@@ -153,6 +170,7 @@
           </div>
         </div>
       </div>
+
     </div>
 
     <div class="flex justify-end gap-2">
