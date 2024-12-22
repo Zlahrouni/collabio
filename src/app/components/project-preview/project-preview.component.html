@@ -13,16 +13,11 @@
     </button>
   </div>
 
-  <!-- Project Info -->
-  <h2 class="text-lg font-bold text-gray-900 dark:text-white">
-    {{ project.name | truncate: 20 }}
-  </h2>
-  <p class="text-gray-500 dark:text-gray-400 mt-2">
+  <h2 class="text-lg font-bold">{{ project.name | truncate: 20 }}</h2>
+  <p class="text-xs text-gray-500 whitespace-normal break-words overflow-wrap-anywhere dark:text-white">
     {{ project.description.trim() === '' ? '(No description)' : project.description | truncate: 40}}
   </p>
-  <p class="text-gray-500 dark:text-gray-400 mt-1">
-    Budget: {{ project.budget }}$
-  </p>
+  <p class="text-xs text-gray-500  dark:text-gray-400 mt-1">Budget: {{ project.budget }}$</p>
 </div>
 
 <!-- Delete Confirmation Modal -->
