@@ -8,8 +8,8 @@ import {CreateUserStoryComponent} from "../create-user-story/create-user-story.c
 import {UserStoryDetailsComponent} from "../user-story-details/user-story-details.component";
 import {PriorityIconDirective} from "../../directives/priority-icon.directive";
 import {TruncatePipe} from "../../pipes/truncate.pipe";
-import {debounceTime, distinctUntilChanged, Subject} from "rxjs";
 import {FormsModule} from "@angular/forms";
+import {debounceTime, distinctUntilChanged, Subject} from "rxjs";
 
 @Component({
   selector: 'clb-backlog',
