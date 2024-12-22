@@ -67,9 +67,9 @@
     </div>
 
     <!-- Assign To Section -->
-
-    <div class="form-group">
+    <div>
       <label class="block mb-2 text-gray-700 dark:text-gray-300 font-medium">Assign To</label>
+
       <!-- User Search Input -->
       <div *ngIf="selectedUsers.trim() == ''">
         <div class="flex">
@@ -110,18 +110,18 @@
         <span class="text-gray-700 dark:text-gray-300">{{selectedUsers}}</span>
         <button
           type="button"
-          class="px-3 py-1 text-sm text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/50 rounded-lg transition-colors"
+          class="p-1.5 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/50 rounded-lg transition-colors"
           (click)="removeUser(selectedUsers)"
         >
-        <img src="app/assets/icons/cancel-indigo.png" alt="Delete" class="w-4 h-4 hover:recycle-bin-open">
-      </button>
+          <img src="app/assets/icons/cancel-indigo.png" alt="Delete" class="w-4 h-4">
+        </button>
       </div>
     </div>
 
     <!-- Submit Button -->
     <div class="flex justify-end pt-4">
       <button
-        class="px-6 py-3 bg-indigo-600 dark:bg-indigo-500 text-white rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-400 transition-colors focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:ring-offset-2"
+        class="px-6 py-3 bg-indigo-600 dark:bg-indigo-500 text-white rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-400 transition-colors focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
         (click)="onSubmit()"
       >
         Create User Story
