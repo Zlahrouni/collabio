@@ -82,9 +82,10 @@ export const ProjectExistsGuard: CanActivateFn = (route, state) => {
   const projectService = inject(ProjectService);
   const router = inject(Router);
   const projectId = route.paramMap.get('id');
+
   if (!projectId) {
-    console.log('No project ID provided')
-    return router.createUrlTree(['/']);
+    console.log('No project ID provided');
+    return router.createUrlTree(['/not-found']);
   }
 
   return projectService.getProjectById(projectId).pipe(
@@ -93,8 +94,37 @@ export const ProjectExistsGuard: CanActivateFn = (route, state) => {
       if (project) {
         return true;
       } else {
-        return router.createUrlTree(['/']);
+        console.log('Project not found');
+        return router.createUrlTree(['/not-found']);
       }
     })
   );
 };
+
+export const ProjectMemberGuard: CanActivateFn = (route, state) => {
+  const projectService = inject(ProjectService);
+  const userService = inject(UserService);
+  const router = inject(Router);
+  const projectId = route.paramMap.get('id');
+  const currentUser = userService.getLocalUser()?.username;
+
+  if (!projectId || !currentUser) {
+    return router.createUrlTree(['/not-found']);
+  }
+
+  return projectService.getProjectById(projectId).pipe(
+    take(1),
+    map(project => {
+      if (!project) {
+        return router.createUrlTree(['/not-found']);
+      }
+
+      if (project.users.includes(currentUser)) {
+        return true;
+      } else {
+        return router.createUrlTree(['/not-authorized']);
+      }
+    })
+  );
+};
+

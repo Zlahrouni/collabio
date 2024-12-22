@@ -122,7 +122,7 @@ export class BacklogComponent implements OnInit {
     });
 
     this.closeDeleteUserStoryModal();
-
+    this.refreshUserStories()
   }
 
   // Ajout d'une méthode pour rafraîchir la liste après une mise à jour
@@ -182,4 +182,5 @@ export class BacklogComponent implements OnInit {
     this.closeUserStoryModal();
   }
 
+  protected readonly UserStoryService = UserStoryService;
 }
