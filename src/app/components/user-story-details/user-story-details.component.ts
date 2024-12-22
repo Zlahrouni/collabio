@@ -5,6 +5,7 @@ import { UserStory } from "../../models/userStory";
 import { UserStoryService } from '../../services/user-story.service';
 import { UserService } from '../../services/user.service';
 import {TruncatePipe} from "../../pipes/truncate.pipe";
+import {AuthService} from "../../services/auth.service";
 @Component({
   selector: 'clb-user-story-details',
   standalone: true,
@@ -20,21 +21,31 @@ export class UserStoryDetailsComponent {
 
   isEditing = false;
   editForm: FormGroup;
+  currentUser: string = '';
+  isProjectCreator: boolean = false;
 
-  // Pour la gestion des utilisateurs
   allUsers: string[] = [];
   filteredUsers: string[] = [];
-  selectedUsers: string = '';
   isFocused = false;
   userModified = false;
   errorMessages: string[] = [];
 
+  types = ['Functionality', 'Update', 'Bug fix'];
+  priorities = ['High', 'Medium', 'Low'];
+  allstatus = ['Not started', 'In progress', 'Completed'];
+
   constructor(
     private fb: FormBuilder,
     private userStoryService: UserStoryService,
-    private userService: UserService
+    private userService: UserService,
+    private authService: AuthService
   ) {
-    this.editForm = this.fb.group({
+    this.editForm = this.createForm();
+    this.initializeCurrentUser();
+  }
+
+  private createForm(): FormGroup {
+    return this.fb.group({
       title: ['', [Validators.required, Validators.minLength(3)]],
       description: ['', [Validators.required, Validators.minLength(10)]],
       status: ['Not started', Validators.required],
@@ -44,111 +55,30 @@ export class UserStoryDetailsComponent {
     });
   }
 
-  types = [
-    'Functionality',
-    'Update',
-    'Bug fix',
-  ];
-
-  priorities = [
-    'High',
-    'Medium',
-    'Low'
-  ];
-
-  allstatus = [
-    'Completed',
-    'In progress',
-    'Not started'
-  ];
+  private async initializeCurrentUser() {
+    this.currentUser = await this.userService.getLocalUser()?.username!;
+    this.isProjectCreator = await this.userStoryService.isProjectOwner(this.currentUser);
+  }
 
   ngOnInit() {
-    // Charger la liste des utilisateurs disponibles
-    this.userService.getUsersUsernames().subscribe({
-      next: (users) => {
-        this.allUsers = users;
-      },
-      error: (error) => {
-        console.error('Error loading users:', error);
-      }
-    });
+    this.loadUsers();
   }
 
   ngOnChanges() {
     if (this.userStory) {
-      this.editForm.patchValue({
-        title: this.userStory.title,
-        description: this.userStory.description,
-        status: this.userStory.status,
-        type: this.userStory.type,
-        storyPoints: this.userStory.storyPoints
-      });
-      this.userModified = false;
-    }
-
-    this.userService.getUsersUsernames().subscribe({
-      next: (users) => {
-        this.allUsers = users;
-      },
-      error: (error) => {
-        console.error('Error loading users:', error);
-      }
-    });
-  }
-
-  toggleEdit() {
-    this.isEditing = !this.isEditing;
-    if (this.isEditing && this.userStory) {
       this.editForm.patchValue(this.userStory);
       this.userModified = false;
     }
+    this.loadUsers();
   }
 
-
-  CanUpdate(): boolean {
-    // Vérifie si userStory existe
-    if (!this.userStory) {  
-      return false;
-    }
-
-    // Si l'histoire est complétée, on ne peut pas la modifier
-    if (this.userStory.status === 'Completed') {
-      return false;
-    }
-
-    // Vérifie si le statut est en cours et qu'on essaie de désaffecter
-    if (this.userStory.status === 'In progress' && 
-        this.userStory.assignedTo && 
-        !this.editForm.get('assignedTo')?.value) {
-      return false;
-    }
-
-    // Vérifie la progression du statut
-    const statusOrder = ['Not started', 'In progress', 'Completed'];
-    const currentIndex = statusOrder.indexOf(this.userStory.status);
-    const newStatus = this.editForm.get('status')?.value;
-
-    if (!newStatus) {
-      return true; // Si pas de changement de statut, on autorise
-    }
-
-    const newIndex = statusOrder.indexOf(newStatus);
-
-    // Empêche de rétrograder le statut
-    if (newIndex < currentIndex) {
-      return false;
-    }
-
-    // Empêche de sauter un statut
-    if (newIndex > currentIndex + 1) {
-      return false;
-    }
-
-    // Par défaut, on autorise la modification
-    return true;
+  private loadUsers() {
+    this.userService.getUsersUsernames().subscribe({
+      next: (users) => this.allUsers = users,
+      error: (error) => console.error('Error loading users:', error)
+    });
   }
 
-  // Gestion des utilisateurs
   searchUsers(event: Event) {
     const query = (event.target as HTMLInputElement).value.toLowerCase();
     if (query === '') {
@@ -159,6 +89,8 @@ export class UserStoryDetailsComponent {
         .slice(0, 4);
     }
   }
+
+
 
   onFocus(): void {
     this.isFocused = true;
@@ -186,13 +118,86 @@ export class UserStoryDetailsComponent {
     }
   }
 
+  canShowEditButton(): boolean {
+    if (!this.userStory) return false;
+
+    // Cannot edit completed stories
+    if (this.userStory.status === 'Completed') return false;
+
+    // Project creator can always edit
+    if (this.isProjectCreator) return true;
+
+    // If story is not assigned, any member can edit
+    if (!this.userStory.assignedTo) return true;
+
+    // Assigned user can edit their own stories
+    return this.userStory.assignedTo === this.currentUser;
+  }
+
+  canChangeStatus(): boolean {
+    if (!this.userStory) return false;
+    return this.userStory.assignedTo === this.currentUser || this.isProjectCreator;
+  }
+
+  validateStatusTransition(newStatus: string): boolean {
+    if (!this.userStory) return false;
+
+    const statusOrder = ['Not started', 'In progress', 'Completed'];
+    const currentIndex = statusOrder.indexOf(this.userStory.status);
+    const newIndex = statusOrder.indexOf(newStatus);
+
+    // Cannot move backwards
+    if (newIndex < currentIndex) return false;
+
+    // Cannot skip status
+    if (newIndex > currentIndex + 1) return false;
+
+    return true;
+  }
+
+  onStatusChange(event: any) {
+    const newStatus = event.target.value;
+    if (!this.validateStatusTransition(newStatus)) {
+      event.preventDefault();
+      this.editForm.patchValue({ status: this.userStory?.status });
+      this.errorMessages.push('Invalid status transition');
+    }
+  }
+
+  toggleEdit() {
+    this.isEditing = !this.isEditing;
+    if (this.isEditing && this.userStory) {
+      this.editForm.patchValue(this.userStory);
+      this.userModified = false;
+      this.errorMessages = [];
+    }
+  }
+
   onSubmit() {
     this.errorMessages = [];
-    if ((this.editForm.valid || this.userModified) && this.userStory?.id) {
+
+    if (!this.editForm.valid && !this.userModified) {
+      this.validateForm();
+      return;
+    }
+
+    if (this.userStory?.id) {
       const updates = {
         ...this.editForm.value,
         assignedTo: this.userStory.assignedTo
       };
+
+      // Validate status change
+      if (updates.status !== this.userStory.status && !this.canChangeStatus()) {
+        this.errorMessages.push('You are not authorized to change the status');
+        return;
+      }
+
+      // Prevent unassigning from in-progress story
+      if (this.userStory.status === 'In progress' && !updates.assignedTo) {
+        this.errorMessages.push('Cannot unassign from an in-progress story');
+        return;
+      }
 
       this.userStoryService.updateUserStory(this.userStory.id, updates)
         .subscribe({
@@ -203,29 +208,27 @@ export class UserStoryDetailsComponent {
           },
           error: (error) => {
             console.error('Error updating user story:', error);
-            alert('Error updating user story');
+            this.errorMessages.push('Error updating user story');
           }
         });
-    }else{
-      Object.keys(this.editForm.controls).forEach(key => {
-        const controlErrors = this.editForm.get(key)?.errors;
-        if (controlErrors) {
-          Object.keys(controlErrors).forEach(errorKey => {
-            this.errorMessages.push(this.getErrorMessage(key, errorKey));
-          });
-        }
-      });
+    }
+  }
 
-      // Focus with a timeout to ensure the element is rendered
-      if (this.errorMessages.length > 0) {
-        setTimeout(() => {
-          const errorMessagesElement = document.getElementById('error-messages');
-          if (errorMessagesElement) {
-            errorMessagesElement.focus();
-          }
-        }, 0);
+  private validateForm() {
+    Object.keys(this.editForm.controls).forEach(key => {
+      const control = this.editForm.get(key);
+      if (control?.errors) {
+        Object.keys(control.errors).forEach(errorKey => {
+          this.errorMessages.push(this.getErrorMessage(key, errorKey));
+        });
       }
+    });
 
+    if (this.errorMessages.length > 0) {
+      setTimeout(() => {
+        const errorElement = document.getElementById('error-messages');
+        errorElement?.focus();
+      });
     }
   }
 
