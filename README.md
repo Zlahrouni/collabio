@@ -7,6 +7,11 @@ This project is a task management application called Collabio, designed to help 
 - Sabrina Tamda  [GitHub](https://github.com/tamdasab)
 - Mohamed Kerraz [GitHub](https://github.com/mohamedkerraz)
 
+## Preview :
+![clb-preview-home](https://github.com/user-attachments/assets/c979c857-ae49-4a49-ac19-a5da069e332a)
+![clb-preview-project-details](https://github.com/user-attachments/assets/2183a3b4-bdb8-4aff-a12a-df99c9b6c17e)
+![clb-preview-backlog](https://github.com/user-attachments/assets/98358444-2b05-484b-bef5-4fb1dbb996ee)
+
 ## Features
 - **User Authentication** :
   - Secure login and registration with Firebase Authentication
@@ -49,7 +54,6 @@ For testing purposes, you can use the following account:
 Email: preview@collab.io
 Password: preview@collab.io
 ```
-Note: This is a demo account with limited permissions.
 
 ## Future Updates
 Potential features for future updates:
