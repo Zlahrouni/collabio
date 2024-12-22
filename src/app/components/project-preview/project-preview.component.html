@@ -6,7 +6,7 @@
   <!-- Delete Button -->
   <div class="absolute top-2 right-2">
     <button
-      *ngIf="!showConfirmDelete"
+      *ngIf="!showConfirmDelete && CanDelete"
       (click)="onDeleteClick($event)"
       class="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">
       <img src="app/assets/icons/cancel-indigo.png" alt="Delete" class="w-4 h-4 ml-2">
@@ -23,6 +23,7 @@
   <p class="text-gray-500 dark:text-gray-400 mt-1">
     Budget: {{ project.budget }}$
   </p>
+
 </div>
 
 <!-- Delete Confirmation Modal -->

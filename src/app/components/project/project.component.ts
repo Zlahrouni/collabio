@@ -17,10 +17,13 @@ export class ProjectComponent implements OnInit {
   project: Project | null = null;
   isEditing = false;
   editForm: FormGroup;
+  isFocused = false;
+  errors: string[] = [];
 
 
-  allUsers: string[] = [];
+  users: string[] = [];
   filteredUsers: string[] = [];
+  selectedUsers: string[] = [];
   showUserResults = false;
 
   constructor(
@@ -68,7 +71,7 @@ export class ProjectComponent implements OnInit {
     this.userService.getUsersUsernames().subscribe({
       next: (users) => {
         const currentUser = this.userService.getLocalUser()?.username;
-        this.allUsers = users.filter(user => user !== currentUser);
+        this.users = users.filter(user => user !== currentUser);
       },
       error: (error) => {
         console.error('Error loading users:', error);
@@ -129,32 +132,44 @@ export class ProjectComponent implements OnInit {
   }
 
 
-  searchUsers(event: Event) {
-    const query = (event.target as HTMLInputElement).value.toLowerCase();
-    this.filteredUsers = this.allUsers
-      .filter(user => 
-        user.toLowerCase().includes(query) &&
-        !this.project?.users.includes(user)
-      )
-      .slice(0, 4);
-  }
-
-  onUserSearchFocus() {
-    this.showUserResults = true;
-  }
-
-  onUserSearchBlur() {
-    // Ajout d'un petit delais avant de masquer les résultats
-    setTimeout(() => {
-      this.showUserResults = false;
-    }, 200);
-  }
-
-  addUser(username: string) {
-    if (this.project && !this.project.users.includes(username)) {
-      const updatedUsers = [...this.project.users, username];
-      this.updateProjectUsers(updatedUsers);
+  searchUsers(eventOrQuery: Event | string = '') {
+    let query: string;
+    if (typeof eventOrQuery === 'string') {
+      query = eventOrQuery;
+    } else {
+      query = (eventOrQuery.target as HTMLInputElement).value;
     }
+
+    if (query || this.isFocused) {
+      this.filteredUsers = this.users
+        .filter(user =>
+          user.toLowerCase().includes(query.toLowerCase()) &&
+          !this.selectedUsers.some(selected => selected === user)
+        )
+        .slice(0, 4); // Limit to the first four users
+    } else {
+      this.filteredUsers = [];
+    }
+  }
+
+  addUser(user: string) {
+    if (this.project && !this.project.users.includes(user)) {
+      const updatedUsers = [...this.project.users, user];
+      this.selectedUsers.push(user);
+      this.updateProjectUsers(updatedUsers);
+      this.filteredUsers = [];
+      this.isFocused = false;
+    }
+  }
+
+  onFocus() {
+    this.isFocused = true;
+    this.searchUsers('');
+  }
+
+  onBlur() {
+    this.isFocused = false;
+    this.filteredUsers = [];
   }
 
   removeUser(username: string) {
