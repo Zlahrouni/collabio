@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { UserStory } from 'src/app/models/userStory';
 import { UserStoryService } from 'src/app/services/user-story.service';
@@ -8,11 +8,13 @@ import {CreateUserStoryComponent} from "../create-user-story/create-user-story.c
 import {UserStoryDetailsComponent} from "../user-story-details/user-story-details.component";
 import {PriorityIconDirective} from "../../directives/priority-icon.directive";
 import {TruncatePipe} from "../../pipes/truncate.pipe";
+import {FormsModule} from "@angular/forms";
+import {debounceTime, distinctUntilChanged, Subject} from "rxjs";
 
 @Component({
   selector: 'clb-backlog',
   standalone: true,
-  imports: [CommonModule, ModalComponent, CreateUserStoryComponent, UserStoryDetailsComponent, PriorityIconDirective, TruncatePipe],
+  imports: [CommonModule, ModalComponent, CreateUserStoryComponent, UserStoryDetailsComponent, PriorityIconDirective, TruncatePipe, FormsModule],
   templateUrl: './backlog.component.html',
   styleUrls: ['./backlog.component.scss']
 })
@@ -24,27 +26,88 @@ export class BacklogComponent implements OnInit {
   selectedUserStory: UserStory | null = null;
 
   createUsModalOpen = false;
-
-
+  searchTerm: string = '';
+  filteredUserStories: UserStory[] = [];
+  private searchSubject = new Subject<string>();
+  @ViewChild('searchInput') searchInput!: ElementRef;
   @ViewChild(CreateUserStoryComponent) createUserStoryComponent!: CreateUserStoryComponent;
+  private readonly priorityOrder = {
+    'High': 1,
+    'Medium': 2,
+    'Low': 3
+  };
 
   constructor(private route: ActivatedRoute, private readonly userStorieService: UserStoryService) { }
 
   ngOnInit(): void {
+    this.searchSubject.pipe(
+      debounceTime(300),
+      distinctUntilChanged()
+    ).subscribe(searchTerm => {
+      this.filterUserStories(searchTerm);
+    });
+
     this.route.paramMap.subscribe(params => {
       this.projectId = params.get('id')!;
     });
 
-    // Fetch user stories for the project
+    // Fetch and sort user stories
     this.userStorieService.getUserStories(this.projectId!).subscribe({
       next: (userStories) => {
-        this.userStories = userStories;
+        this.userStories = this.sortUserStoriesByPriority(userStories);
+        this.filteredUserStories = this.userStories;
       },
       error: (error) => {
         console.error('Error fetching user stories:', error);
       }
     });
   }
+
+  private sortUserStoriesByPriority(stories: UserStory[]): UserStory[] {
+    return [...stories].sort((a, b) => {
+      const priorityA = this.priorityOrder[a.priority as keyof typeof this.priorityOrder] || 999;
+      const priorityB = this.priorityOrder[b.priority as keyof typeof this.priorityOrder] || 999;
+      return priorityA - priorityB;
+    });
+  }
+
+  onSearch(event: Event): void {
+    const searchTerm = (event.target as HTMLInputElement).value;
+    this.searchSubject.next(searchTerm.toLowerCase());
+  }
+
+  clearSearch(): void {
+    this.searchTerm = '';
+    this.searchSubject.next('');
+    this.searchInput.nativeElement.focus();
+  }
+
+  private filterUserStories(searchTerm: string): void {
+    if (!searchTerm) {
+      this.filteredUserStories = [...this.userStories]; // Already sorted
+      return;
+    }
+
+    this.filteredUserStories = this.userStories.filter(story => {
+      const searchTermLower = searchTerm.toLowerCase();
+
+      const titleMatch = story.title?.toLowerCase()?.includes(searchTermLower) ?? false;
+      const descriptionMatch = story.description?.toLowerCase()?.includes(searchTermLower) ?? false;
+      const typeMatch = story.type?.toLowerCase()?.includes(searchTermLower) ?? false;
+      const priorityMatch = story.priority?.toLowerCase()?.includes(searchTermLower) ?? false;
+      const assignedToMatch = story.assignedTo?.toLowerCase()?.includes(searchTermLower) ?? false;
+      const statusMatch = story.status?.toLowerCase()?.includes(searchTermLower) ?? false;
+
+      return titleMatch ||
+        descriptionMatch ||
+        typeMatch ||
+        priorityMatch ||
+        assignedToMatch ||
+        statusMatch;
+    });
+  }
+
+
 
   deleteUserStory(userStory: UserStory) {
 
@@ -66,7 +129,12 @@ export class BacklogComponent implements OnInit {
   refreshUserStories() {
     this.userStorieService.getUserStories(this.projectId).subscribe({
       next: (userStories) => {
-        this.userStories = userStories;
+        this.userStories = this.sortUserStoriesByPriority(userStories);
+        if (this.searchTerm) {
+          this.filterUserStories(this.searchTerm);
+        } else {
+          this.filteredUserStories = [...this.userStories];
+        }
       },
       error: (error) => {
         console.error('Error fetching user stories:', error);
