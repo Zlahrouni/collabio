@@ -78,4 +78,7 @@ export class UserStoryService {
   }
 
 
+  async isProjectOwner(currentUser: string) {
+    return true;
+  }
 }
