@@ -6,6 +6,7 @@ import {Observable, Subscription} from 'rxjs';
 import { User } from '@angular/fire/auth';
 import {UserService} from "../../services/user.service";
 import {TruncatePipe} from "../../pipes/truncate.pipe";
+import {ThemeService} from "../../services/theme.service";
 
 @Component({
   selector: 'clb-navbar',
@@ -20,14 +21,21 @@ export class NavbarComponent implements OnInit, OnDestroy {
   private documentClickListener: any;
   private authSubscription?: Subscription;
   private userDataSubscription?: Subscription;
+  isDarkMode: boolean = false;
 
   constructor(
     private authService: AuthService,
     private readonly userService: UserService,
-    private router: Router
+    private router: Router,
+    private themeService: ThemeService
   ) {}
 
   ngOnInit(): void {
+
+    this.themeService.darkMode$.subscribe(
+      isDark => this.isDarkMode = isDark
+    );
+
     // Subscribe to auth state
     this.authSubscription = this.authService.user$.subscribe(user => {
       this.isConnected = !!user;
@@ -59,6 +67,10 @@ export class NavbarComponent implements OnInit, OnDestroy {
     };
 
     document.addEventListener('click', this.documentClickListener);
+  }
+
+  toggleTheme() {
+    this.themeService.toggleTheme();
   }
 
   ngOnDestroy(): void {
