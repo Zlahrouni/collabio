@@ -1,0 +1,51 @@
+<!-- Project Card -->
+<div *ngIf="project"
+     class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md dark:shadow-gray-900/30 relative transform transition-transform duration-300 hover:scale-105"
+     [routerLink]="['/project', project.id]">
+
+  <!-- Delete Button -->
+  <div class="absolute top-2 right-2">
+    <button
+      *ngIf="!showConfirmDelete && CanDelete"
+      (click)="onDeleteClick($event)"
+      class="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">
+      <img src="app/assets/icons/cancel-indigo.png" alt="Delete" class="w-4 h-4 ml-2">
+    </button>
+  </div>
+
+  <!-- Project Info -->
+  <h2 class="text-lg font-bold text-gray-900 dark:text-white">
+    {{ project.name | truncate: 20 }}
+  </h2>
+  <p class="text-gray-500 dark:text-gray-400 mt-2">
+    {{ project.description.trim() === '' ? '(No description)' : project.description | truncate: 40}}
+  </p>
+  <p class="text-gray-500 dark:text-gray-400 mt-1">
+    Budget: {{ project.budget }}$
+  </p>
+
+</div>
+
+<!-- Delete Confirmation Modal -->
+<clb-modal
+  [isOpen]="showConfirmDelete"
+  (closeModal)="cancelDelete()"
+  title="Confirm Project Deletion ?">
+  <div class="flex flex-col items-center justify-center space-y-4">
+    <p class="text-gray-600 dark:text-gray-300 mb-4">
+      Are you sure you want to delete this project and its US? This action cannot be undone
+    </p>
+    <div class="flex space-x-4">
+      <button
+        (click)="confirmDelete();"
+        class="px-4 py-2 bg-red-500 dark:bg-red-600 text-white rounded-md hover:bg-red-600 dark:hover:bg-red-500 transition-colors duration-200">
+        Delete
+      </button>
+      <button
+        (click)="cancelDelete()"
+        class="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-md hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors duration-200">
+        Cancel
+      </button>
+    </div>
+  </div>
+</clb-modal>
