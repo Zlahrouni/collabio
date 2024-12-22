@@ -11,7 +11,7 @@ import {
   Firestore,
   getDoc,
   deleteDoc,
-  updateDoc
+  updateDoc, getDocs
 } from "@angular/fire/firestore";
 import {Project} from "../models/project";
 import {catchError, from, map, Observable, of, switchMap} from "rxjs";
@@ -52,6 +52,29 @@ export class ProjectService {
 
   getProjects() {
     return collectionData(this.projectCollection);
+  }
+
+  async searchProjects(searchTerm: string): Promise<any[]> {
+    const searchTermLower = searchTerm.toLowerCase();
+
+    try {
+      // First, get all projects the user has access to
+      const projectsSnapshot = await getDocs(this.projectCollection);
+
+      // Filter projects based on search term
+      return projectsSnapshot.docs
+        .map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }))
+        .filter(project =>
+          project.name.toLowerCase().includes(searchTermLower) ||
+          project.description?.toLowerCase().includes(searchTermLower)
+        );
+    } catch (error) {
+      console.error('Error searching projects:', error);
+      return [];
+    }
   }
 
   getMyProjects(): Observable<Project[]> {
@@ -176,5 +199,5 @@ export class ProjectService {
   }
 
 
-  
+
 }

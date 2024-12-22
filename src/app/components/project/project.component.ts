@@ -14,12 +14,13 @@ import { BudgetValidators } from 'src/app/components/shared/validators/budget.va
   styleUrls: ['./project.component.scss']
 })
 export class ProjectComponent implements OnInit {
+  isProjectMember: boolean = false;
   project: Project | null = null;
   isEditing = false;
   editForm: FormGroup;
   isFocused = false;
   errors: string[] = [];
-
+  currentUser?: string;
 
   users: string[] = [];
   filteredUsers: string[] = [];
@@ -41,6 +42,9 @@ export class ProjectComponent implements OnInit {
    }
 
   ngOnInit() {
+    // Get current user first
+    this.currentUser = this.userService.getLocalUser()?.username;
+
     this.route.paramMap.subscribe(params => {
       const id = params.get('id');
       console.log('Extracted Route ID:', id);
@@ -48,10 +52,9 @@ export class ProjectComponent implements OnInit {
       if (id) {
         this.projectService.getProjectById(id).subscribe({
           next: (project) => {
-            console.log('Fetched Project Full Details:', project);
-
             if (project) {
               this.project = project;
+              this.checkProjectMembership();
             } else {
               console.warn('No project found with the given ID');
             }
@@ -70,13 +73,21 @@ export class ProjectComponent implements OnInit {
 
     this.userService.getUsersUsernames().subscribe({
       next: (users) => {
-        const currentUser = this.userService.getLocalUser()?.username;
-        this.users = users.filter(user => user !== currentUser);
+
+        this.users = users.filter(user => user !== this.currentUser);
       },
       error: (error) => {
         console.error('Error loading users:', error);
       }
     });
+  }
+
+  private checkProjectMembership() {
+    if (this.project && this.currentUser) {
+      this.isProjectMember = this.project.users.includes(this.currentUser);
+    } else {
+      this.isProjectMember = false;
+    }
   }
 
   toggleEdit() {
@@ -96,7 +107,7 @@ export class ProjectComponent implements OnInit {
         ]);
         budgetControl.updateValueAndValidity();
       }
-    } 
+    }
   }
 
   onSubmit() {

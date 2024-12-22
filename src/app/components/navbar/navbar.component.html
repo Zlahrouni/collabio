@@ -5,11 +5,45 @@
         <img src="app/assets/logo_long.png" class="h-10" alt="Collabio Logo"/>
       </a>
     </div>
-    <div *ngIf="this.isConnected" class="flex-grow flex items-center justify-center">
-      <input
-        type="text"
-        class="block w-full max-w-md py-2 px-3 text-gray-900 rounded border border-gray-100 focus:outline-none focus:border-blue-500 dark:bg-gray-800 dark:text-white dark:border-gray-700"
-        placeholder="Search..." />
+    <div class="flex-grow flex items-center justify-center" id="search-container">
+      <div class="relative w-full max-w-md">
+        <input
+          type="text"
+          [formControl]="searchControl"
+          class="block w-full py-2 px-3 text-gray-900 rounded border border-gray-100 focus:outline-none focus:border-blue-500 dark:bg-gray-800 dark:text-white dark:border-gray-700"
+          placeholder="Search projects..."
+        />
+
+        <!-- Loading indicator -->
+        <div *ngIf="isSearching" class="absolute right-3 top-1/2 -translate-y-1/2">
+          <div class="animate-spin rounded-full h-4 w-4 border-2 border-gray-500 border-t-transparent"></div>
+        </div>
+
+        <!-- Search Results Dropdown -->
+        <div *ngIf="showSearchResults && searchResults.length > 0"
+             class="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg">
+          <div class="max-h-96 overflow-y-auto">
+            <div *ngFor="let project of searchResults"
+                 (click)="navigateToProject(project.id)"
+                 class="p-3 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-200 dark:border-gray-700 last:border-0">
+              <div class="flex items-center">
+                <div>
+                  <h4 class="font-medium text-gray-900 dark:text-white">{{ project.name }}</h4>
+                  <p class="text-sm text-gray-500 dark:text-gray-400">{{ project.description | truncate:100 }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- No Results Message -->
+        <div *ngIf="showSearchResults && searchResults.length === 0 && searchControl.value"
+             class="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg">
+          <div class="p-3 text-center text-gray-500 dark:text-gray-400">
+            No projects found
+          </div>
+        </div>
+      </div>
     </div>
     <div *ngIf="this.isConnected" class="flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
       <!-- Username -->
